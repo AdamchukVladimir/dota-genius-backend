@@ -4,6 +4,8 @@ import { AppService } from './app.service'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModuleApi } from './api/graphql/graphql.module'
+import { Token } from './api/graphql/token/token.model'
+import { League } from './api/graphql/models/league.model'
 
 @Module({
   controllers: [AppController],
@@ -20,7 +22,7 @@ import { GraphQLModuleApi } from './api/graphql/graphql.module'
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [],
+      models: [Token, League], //import Token model
       autoLoadModels: true,
     }),
   ],

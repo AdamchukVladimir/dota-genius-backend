@@ -8,7 +8,8 @@ export class GraphQLController {
   @Get('data')
   async getData() {
     try {
-      const graphqlData = await this.graphQLService.fetchLeagues()
+      const graphqlData =
+        await this.graphQLService.fetchLeaguesAndSaveToDatabase()
       // Обработка данных, возвращенных из GraphQL-запроса
       return graphqlData
     } catch (error) {
