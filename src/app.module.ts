@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config'
 import { GraphQLModuleApi } from './api/graphql/graphql.module'
 import { Token } from './api/graphql/token/token.model'
 import { League } from './api/graphql/models/league.model'
+import { WinstonModule } from 'nest-winston' //loger to file
+import * as winston from 'winston' //logger to file
 
 @Module({
   controllers: [AppController],
@@ -22,8 +24,17 @@ import { League } from './api/graphql/models/league.model'
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [Token, League], //import Token model
-      autoLoadModels: true,
+      models: [Token, League], //import postgres model
+      //autoLoadModels: true,
+      //synchronize: true,
+    }),
+    WinstonModule.forRoot({
+      //logger to file
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'combined.log' }),
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+      ],
     }),
   ],
 })

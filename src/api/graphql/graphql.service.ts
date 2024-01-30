@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Inject } from '@nestjs/common'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import { FETCH_LEAGUES_QUERY } from './queries/leagues'
 import { Token } from './token/token.model'
 import { League } from './models/league.model'
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
+import { Logger } from 'winston'
 
 @Injectable()
 export class GraphQLService {
   private apolloClient: ApolloClient<InMemoryCache>
   private authToken: string
 
-  constructor() {
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {
     this.authToken = ''
 
     this.initializeApolloClient()
@@ -40,11 +44,11 @@ export class GraphQLService {
       if (tokenEntry) {
         return tokenEntry.token
       } else {
-        console.error('Token entry not found in the database.')
+        this.logger.error('Token entry not found in the database.')
         return ''
       }
     } catch (error) {
-      console.error('Error while querying the database:', error)
+      this.logger.error('Error while querying the database:', error)
       return ''
     }
   }
@@ -66,15 +70,23 @@ export class GraphQLService {
   private async saveLeaguesToDatabase(leagues: any[]): Promise<void> {
     try {
       for (const league of leagues) {
-        await League.create({
-          attributes: ['league'],
-          league_id: league.id,
-          tier: league.tier,
-          region: league.region,
+        const [createdLeague, created] = await League.findOrCreate({
+          where: { league_id: league.id },
+          defaults: {
+            tier: league.tier,
+            region: league.region,
+            startDateTime: new Date(league.startDateTime * 1000), //get date from unix date
+            endDateTime: new Date(league.endDateTime * 1000),
+          },
         })
+        if (!created) {
+          this.logger.info(
+            `League with league_id ${league.id} already exists. Skipping.`,
+          )
+        }
       }
     } catch (error) {
-      console.error('Error while saving leagues to the database:', error)
+      this.logger.error('Error while saving leagues to the database:', error)
     }
   }
 }

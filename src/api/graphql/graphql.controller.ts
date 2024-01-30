@@ -5,7 +5,7 @@ import { GraphQLService } from './graphql.service'
 export class GraphQLController {
   constructor(private readonly graphQLService: GraphQLService) {}
 
-  @Get('data')
+  @Get('leagues')
   async getData() {
     try {
       const graphqlData =

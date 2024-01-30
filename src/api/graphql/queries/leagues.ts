@@ -7,6 +7,7 @@ export const FETCH_LEAGUES_QUERY = gql`
       tier
       region
       startDateTime
+      endDateTime
     }
   }
 `

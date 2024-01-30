@@ -5,6 +5,8 @@ import {
   PrimaryKey,
   AutoIncrement,
   DataType,
+  CreatedAt,
+  UpdatedAt,
 } from 'sequelize-typescript'
 
 @Table({
@@ -30,4 +32,30 @@ export class League extends Model {
     allowNull: false,
   })
   region: string
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  startDateTime: Date
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  endDateTime: Date
+
+  @CreatedAt
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  createdAt: Date
+
+  @UpdatedAt
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  updatedAt: Date
 }
