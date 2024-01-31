@@ -4,16 +4,19 @@ import { AppService } from './app.service'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModuleApi } from './api/graphql/graphql.module'
+import { LeaguesModule } from './leagues/leagues.module'
 import { Token } from './api/graphql/token/token.model'
-import { League } from './api/graphql/models/league.model'
+import { League } from './models/league.model'
 import { WinstonModule } from 'nest-winston' //loger to file
 import * as winston from 'winston' //logger to file
+import { ScheduleModule } from '@nestjs/schedule' //Cron scheduler
 
 @Module({
   controllers: [AppController],
   providers: [AppService],
   imports: [
     GraphQLModuleApi,
+    LeaguesModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
@@ -36,6 +39,7 @@ import * as winston from 'winston' //logger to file
         new winston.transports.File({ filename: 'error.log', level: 'error' }),
       ],
     }),
+    ScheduleModule.forRoot(), // Cron scheduler
   ],
 })
 export class AppModule {}
