@@ -81,4 +81,14 @@ export class LeaguesService {
       )
     }
   }
+
+  async getLeaguesFromDB(): Promise<any[]> {
+    try {
+      const leagues = await League.findAll()
+      return leagues
+    } catch (error) {
+      this.logger.error('Error fetching leagues from the database:', error)
+      return []
+    }
+  }
 }

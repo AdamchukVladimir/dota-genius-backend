@@ -10,6 +10,7 @@ import { League } from './models/league.model'
 import { WinstonModule } from 'nest-winston' //loger to file
 import * as winston from 'winston' //logger to file
 import { ScheduleModule } from '@nestjs/schedule' //Cron scheduler
+import { MatchesModule } from './matches/matches.module'
 
 @Module({
   controllers: [AppController],
@@ -40,6 +41,7 @@ import { ScheduleModule } from '@nestjs/schedule' //Cron scheduler
       ],
     }),
     ScheduleModule.forRoot(), // Cron scheduler
+    MatchesModule,
   ],
 })
 export class AppModule {}
