@@ -43,7 +43,7 @@ import { QueueModule } from './queues/queue.module'
     }),
     ScheduleModule.forRoot(), // Cron scheduler
     MatchesModule,
-    QueueModule,
+    QueueModule, // Redis
   ],
 })
 export class AppModule {}
