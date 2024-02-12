@@ -5,11 +5,12 @@ import { QueueService } from './queue.service'
 import { QueueController } from './queue.controller'
 import { GraphQLService } from '../api/graphql/graphql.service'
 import { LeaguesService } from '../leagues/leagues.service'
+import { MatchesService } from '../matches/matches.service'
 import * as Bull from 'bull'
 
 @Module({
   controllers: [QueueController],
-  providers: [QueueService, GraphQLService, LeaguesService],
+  providers: [QueueService, GraphQLService, LeaguesService, MatchesService],
   imports: [
     BullModule.forRootAsync({
       imports: [ConfigModule],
@@ -17,10 +18,6 @@ import * as Bull from 'bull'
         redis: {
           host: configService.get('REDIS_HOST') || 'localhost',
           port: configService.get('REDIS_PORT') || 6379,
-        },
-        limiter: {
-          max: 1, // Count of jobs at the same time
-          duration: 10000, // Waiting time between jobs
         },
       }),
       inject: [ConfigService],
@@ -61,11 +58,11 @@ export class QueueModule implements OnModuleInit {
 
     const queue = new Bull('graphql-to-db', queueOptions)
 
-    queue.process('processMatchByLeagueTask', async (job) => {
+    // jobs processing
+    queue.process('processMatchesByLeagueTask', async (job) => {
       console.log('Processing job:', job.id)
-      // add jobs processing here
-      // example:
-      // await this.queueService.processJob(job.data);
+
+      await this.queueService.processMatchesByLeagueTask(job.data)
     })
 
     queue.on('error', (error) => {

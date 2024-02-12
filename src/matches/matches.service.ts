@@ -7,6 +7,7 @@ import { FETCH_MATCHES_BY_LEAGUE_QUERY } from '../api/graphql/queries/matchesByL
 import { League } from '../models/league.model'
 import { Op } from 'sequelize'
 import { LeaguesService } from '../leagues/leagues.service'
+import { QueueService } from '../queues/queue.service'
 
 @Injectable()
 export class MatchesService {
@@ -16,29 +17,31 @@ export class MatchesService {
   constructor(
     private readonly leaguesService: LeaguesService,
     private readonly graphQLService: GraphQLService,
+    private readonly queueService: QueueService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  //   @Cron(CronExpression.EVERY_5_MINUTES)
-  //   async processMatches(): Promise<void> {
-  //     try {
-  //       const leagues = await this.leaguesService.getLeaguesFromDB()
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async processMatchesByLeagues(): Promise<void> {
+    try {
+      const leagues = await this.leaguesService.getLeaguesFromDB()
 
-  //       for (const league of leagues) {
-  //         const matches = await this.fetchMatchesByLeague(league.league_id)
-  //         await this.saveMatchesToDatabase(matches)
-  //       }
+      for (const league of leagues) {
+        await this.queueService.addMatchByLeagueTaskToQueue(league.league_id)
+        //const matches = await this.fetchMatchesByLeague(league.league_id)
+        //await this.saveMatchesToDatabase(matches)
+      }
 
-  //       // Reset Counter after  finish
-  //       this.resetCounters()
-  //     } catch (error) {
-  //       this.logger.error('Error processing matches:', error)
-  //     }
-  //   }
+      // Reset Counter after  finish
+      //this.resetCounters()
+    } catch (error) {
+      this.logger.error('Error processing matches:', error)
+    }
+  }
 
-  //async fetchMatchesByLeague(leagueId: number): Promise<any[]> {
-  async fetchMatchesByLeague(): Promise<any[]> {
-    const leagueId = 15960
+  async fetchMatchesByLeague(leagueId: number): Promise<any[]> {
+    // async fetchMatchesByLeague(): Promise<any[]> {
+    //   const leagueId = 15960
     try {
       let allMatches: any[] = []
       let matches
@@ -51,10 +54,11 @@ export class MatchesService {
             skip: skipCounter,
             take: 100,
           },
+          fetchPolicy: 'no-cache', // fix cache overload
         })
         matches = result.data.league.matches
         allMatches.push(...matches)
-        skipCounter += 101
+        skipCounter += 100
       } while (matches.length == 100)
       return allMatches
     } catch (error) {
@@ -63,9 +67,7 @@ export class MatchesService {
     }
   }
 
-  private async saveMatchesToDatabase(matches: any[]): Promise<void> {
-    // Здесь вставьте логику сохранения матчей в базу данных
-  }
+  private async saveMatchesToDatabase(matches: any[]): Promise<void> {}
 
   //   private resetCounters(): void {
   //     this.skipCounter = 0

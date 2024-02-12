@@ -7,7 +7,7 @@ export class MatchesController {
 
   @Get()
   async fetchMatchesByLeague(): Promise<any> {
-    const matches = await this.matchesService.fetchMatchesByLeague()
+    const matches = await this.matchesService.fetchMatchesByLeague(15960)
     return matches
   }
 }
