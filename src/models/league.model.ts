@@ -14,7 +14,6 @@ import {
 })
 export class League extends Model {
   @PrimaryKey
-  @AutoIncrement
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -23,25 +22,25 @@ export class League extends Model {
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   tier: string
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   region: string
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: true,
   })
   startDateTime: Date
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: true,
   })
   endDateTime: Date
 

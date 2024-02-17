@@ -1,8 +1,10 @@
 import { gql } from '@apollo/client'
 
 export const FETCH_LEAGUES_QUERY = gql`
-  {
-    leagues(request: { skip: 0, take: 100, startDateTime: 1698513403 }) {
+  query Leagues($startDateTime: Long!, $skip: Int!, $take: Int!) {
+    leagues(
+      request: { skip: $skip, take: $take, startDateTime: $startDateTime }
+    ) {
       id
       tier
       region

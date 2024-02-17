@@ -12,13 +12,12 @@ import * as winston from 'winston' //logger to file
 import { ScheduleModule } from '@nestjs/schedule' //Cron scheduler
 import { MatchesModule } from './matches/matches.module'
 import { QueueModule } from './queues/queue.module'
+import { Match } from './models/match.model'
 
 @Module({
   controllers: [AppController],
   providers: [AppService],
   imports: [
-    GraphQLModuleApi,
-    LeaguesModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
@@ -29,7 +28,7 @@ import { QueueModule } from './queues/queue.module'
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [Token, League], //import postgres model
+      models: [Token, League, Match], //import postgres model
       //autoLoadModels: true,
       //synchronize: true,
     }),
@@ -41,6 +40,8 @@ import { QueueModule } from './queues/queue.module'
         new winston.transports.File({ filename: 'error.log', level: 'error' }),
       ],
     }),
+    GraphQLModuleApi,
+    LeaguesModule,
     ScheduleModule.forRoot(), // Cron scheduler
     MatchesModule,
     QueueModule, // Redis

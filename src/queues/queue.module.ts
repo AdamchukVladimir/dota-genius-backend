@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common'
+import { Module, OnModuleInit, Inject } from '@nestjs/common'
 import { BullModule, BullModuleOptions } from '@nestjs/bull'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { QueueService } from './queue.service'
@@ -7,6 +7,8 @@ import { GraphQLService } from '../api/graphql/graphql.service'
 import { LeaguesService } from '../leagues/leagues.service'
 import { MatchesService } from '../matches/matches.service'
 import * as Bull from 'bull'
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston' // winston churchill
+import { Logger } from 'winston' // logger to file
 
 @Module({
   controllers: [QueueController],
@@ -40,6 +42,7 @@ export class QueueModule implements OnModuleInit {
   constructor(
     private readonly configService: ConfigService,
     private readonly queueService: QueueService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async onModuleInit() {
@@ -52,7 +55,7 @@ export class QueueModule implements OnModuleInit {
       redis: redisConfig,
       limiter: {
         max: 1, // Count of jobs at the same time
-        duration: 10000, // Waiting time between jobs
+        duration: 20000, // Waiting time between jobs 20sec
       },
     }
 
@@ -60,21 +63,31 @@ export class QueueModule implements OnModuleInit {
 
     // jobs processing
     queue.process('processMatchesByLeagueTask', async (job) => {
-      console.log('Processing job:', job.id)
+      //console.log('Processing job:', job.id)
 
       await this.queueService.processMatchesByLeagueTask(job.data)
     })
 
+    queue.process('processReloadMatchDetailsTask', async (job) => {
+      console.log('Processing processMatchesByLeagueTask job:', job.id)
+      this.logger.info(
+        new Date().toLocaleString() +
+          ' Processing processMatchesByLeagueTask job: ' +
+          job.id,
+      )
+      await this.queueService.processReloadMatchDetailsTask(job.data)
+    })
+
     queue.on('error', (error) => {
-      console.error('Queue error:', error)
+      //console.error('Queue error:', error)
     })
 
     queue.on('waiting', () => {
-      console.log('Waiting for jobs...')
+      //console.log('Waiting for jobs...')
     })
 
     queue.on('completed', (job) => {
-      console.log('Completed job:', job.id)
+      //console.log('Completed job:', job.id)
     })
 
     queue.on('failed', (job, error) => {
