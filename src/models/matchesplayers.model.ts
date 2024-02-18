@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 @Table({
-  tableName: 'matches',
+  tableName: 'matchesplayers',
 })
 export class MatchesPlayers extends Model {
   @PrimaryKey
@@ -23,85 +23,91 @@ export class MatchesPlayers extends Model {
 
   @Column({
     type: DataType.BIGINT,
-    allowNull: false,
+    allowNull: true,
   })
   match_id: number
 
   @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  hero_id: number
+
+  @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   steamaccountid: string
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   isradiant: boolean
 
   @Column({
     type: DataType.BOOLEAN,
-    allowNull: false,
+    allowNull: true,
   })
   isvictory: boolean
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   playerslot: string
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   lane: string
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   position: string
 
   @Column({
     type: DataType.BIGINT,
-    allowNull: false,
+    allowNull: true,
   })
   durationseconds: number
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   leaguetier: string
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   seriestype: string
 
   @Column({
     type: DataType.BIGINT,
-    allowNull: false,
+    allowNull: true,
   })
   firstbloodtime: number
 
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: true,
   })
   nickname: string
 
   @Column({
     type: DataType.BIGINT,
-    allowNull: false,
+    allowNull: true,
   })
   teamid: number
 
   @Column({
     type: DataType.BIGINT,
-    allowNull: false,
+    allowNull: true,
   })
   startdatetime: number
 

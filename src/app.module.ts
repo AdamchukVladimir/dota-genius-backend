@@ -13,6 +13,7 @@ import { ScheduleModule } from '@nestjs/schedule' //Cron scheduler
 import { MatchesModule } from './matches/matches.module'
 import { QueueModule } from './queues/queue.module'
 import { Match } from './models/match.model'
+import { MatchesPlayers } from './models/matchesplayers.model'
 
 @Module({
   controllers: [AppController],
@@ -28,7 +29,7 @@ import { Match } from './models/match.model'
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [Token, League, Match], //import postgres model
+      models: [Token, League, Match, MatchesPlayers], //import postgres model
       //autoLoadModels: true,
       //synchronize: true,
     }),
