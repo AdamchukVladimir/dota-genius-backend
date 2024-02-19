@@ -171,49 +171,37 @@ export class MatchesService {
     }
   }
 
-  async saveMatchPlayerToDB(
-    matchPlayerFull: any,
-    matchFull: any,
-  ): Promise<any> {
+  async saveMatchPlayerToDB(matchFull: any): Promise<void> {
+    console.log('match id ' + matchFull.id)
     try {
-      console.log(
-        'saveMatchPlayerToDB match - ' +
-          matchFull.id +
-          ' player ' +
-          matchPlayerFull.steamAccount.name +
-          ' steamId ' +
-          matchPlayerFull.steamAccountId,
-      )
-      const teamid = matchPlayerFull.isRadiant
-        ? matchFull.radiantTeamId
-        : matchFull.direTeamId
-      await MatchesPlayers.findOrCreate({
-        where: {
-          match_id: matchFull.id,
-          steamaccountid: String(matchPlayerFull.steamAccountId),
-          teamid: teamid,
-        },
-        defaults: {
-          hero_id: matchPlayerFull.hero.id,
-          isradiant: matchPlayerFull.isRadiant,
-          isvictory: matchPlayerFull.isVictory,
-          playerslot: matchPlayerFull.playerSlot,
-          lane: matchPlayerFull.lane,
-          position: matchPlayerFull.position,
-          durationseconds: matchFull.durationSeconds,
-          leaguetier: matchFull.league.tier,
-          seriestype: matchFull.series.type,
-          startdatetime: matchFull.startDateTime,
-          firstbloodtime: matchFull.firstBloodTime,
-          nickname: matchPlayerFull.steamAccount.name,
-        },
-      })
+      const dataToCreate = matchFull.players.map((player) => ({
+        match_id: matchFull.id,
+        steamaccountid: String(player.steamAccountId),
+        teamid: player.isRadiant
+          ? matchFull.radiantTeamId
+          : matchFull.direTeamId,
+        hero_id: player.hero.id,
+        isradiant: player.isRadiant,
+        isvictory: player.isVictory,
+        playerslot: player.playerSlot,
+        lane: player.lane,
+        position: player.position,
+        durationseconds: matchFull.durationSeconds,
+        leaguetier: matchFull.league.tier,
+        seriestype: matchFull.series.type,
+        startdatetime: matchFull.startDateTime,
+        firstbloodtime: matchFull.firstBloodTime,
+        nickname: player.steamAccount.name,
+      }))
+
+      await MatchesPlayers.bulkCreate(dataToCreate)
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
           ' matches.service ERROR saveMatchPlayerToDB:',
         error,
       )
+      throw error
     }
   }
 

@@ -14,6 +14,7 @@ import { MatchesModule } from './matches/matches.module'
 import { QueueModule } from './queues/queue.module'
 import { Match } from './models/match.model'
 import { MatchesPlayers } from './models/matchesplayers.model'
+import { SqlReloaderModule } from './sql_reloader/sql_reloader.module'
 
 @Module({
   controllers: [AppController],
@@ -29,7 +30,7 @@ import { MatchesPlayers } from './models/matchesplayers.model'
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [Token, League, Match, MatchesPlayers], //import postgres model
+      models: [Token, League, Match, MatchesPlayers], //import sequilize postgres model
       //autoLoadModels: true,
       //synchronize: true,
     }),
@@ -46,6 +47,7 @@ import { MatchesPlayers } from './models/matchesplayers.model'
     ScheduleModule.forRoot(), // Cron scheduler
     MatchesModule,
     QueueModule, // Redis
+    SqlReloaderModule, // Reloader clear SQL queries
   ],
 })
 export class AppModule {}

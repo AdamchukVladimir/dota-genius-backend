@@ -55,31 +55,7 @@ export class QueueService {
       )
       await this.MatchesService.saveMatchDetailsToDB(matchFull)
 
-      // const matchPlayersPromises = matchFull.players.map((player) => {
-      //   console.log('matchPlayersPromises ' + player.steamAccount.name)
-      //   return this.MatchesService.saveMatchPlayerToDB(player, matchFull)
-      // })
-      // for (const promise of matchPlayersPromises) {
-      //   await promise
-      // }
-
-      // need to fix limit of connection to db
-      const matchPlayersPromises = matchFull.players
-        .filter((player) => player.playerSlot >= 2)
-        .map((player) => {
-          console.log('matchPlayersPromises ' + player.steamAccount.name)
-          return this.MatchesService.saveMatchPlayerToDB(player, matchFull)
-        })
-      for (const promise of matchPlayersPromises) {
-        await promise
-      }
-      // const matchPlayersPromises = matchFull.players
-      //   .filter((player) => !player.isRadiant)
-      //   .map((player) => {
-      //     console.log('matchPlayersPromises ' + player.steamAccount.name)
-      //     return this.MatchesService.saveMatchPlayerToDB(player, matchFull)
-      //   })
-      // await Promise.all(matchPlayersPromises)
+      await this.MatchesService.saveMatchPlayerToDB(matchFull)
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
