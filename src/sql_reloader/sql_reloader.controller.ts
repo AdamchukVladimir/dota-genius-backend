@@ -8,4 +8,19 @@ export class SqlReloaderController {
   async updateHeroesVersusDB() {
     return this.sqlReloerService.updateHeroesVersusDB()
   }
+
+  @Post('/playersupdate')
+  async updatePlayersDB() {
+    return this.sqlReloerService.updatePlayersDB()
+  }
+
+  @Post('/teamsupdate')
+  async updateTeamsDB() {
+    return this.sqlReloerService.updateTeamsDB()
+  }
+
+  @Post('/THupdate')
+  async updateTeamHeroesDB() {
+    return this.sqlReloerService.updateTeamHeroesDB()
+  }
 }
