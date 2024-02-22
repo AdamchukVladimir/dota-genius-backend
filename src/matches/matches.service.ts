@@ -22,10 +22,10 @@ export class MatchesService {
   ) {}
 
   //@Cron(CronExpression.EVERY_5_MINUTES)
-  @Cron(CronExpression.EVERY_HOUR) //Temporary off Cron
+  @Cron(CronExpression.EVERY_DAY_AT_1AM) //Temporary off Cron
   async processMatchesByLeagues(): Promise<void> {
     try {
-      const leagues = await this.leaguesService.getLeaguesFromDB()
+      const leagues = await this.leaguesService.getRecentLeaguesFromDB()
 
       for (const league of leagues) {
         await this.queueService.addMatchByLeagueTaskToQueue(league.league_id)
@@ -38,7 +38,7 @@ export class MatchesService {
       )
     }
   }
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_DAY_AT_4AM)
   async processReloadMatchesDetails(): Promise<void> {
     try {
       const matchesEmpty = await this.getMatchesFromDB()
@@ -56,7 +56,7 @@ export class MatchesService {
       )
     }
   }
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_DAY_AT_5AM)
   async deleteOldMatchesFromDB(): Promise<void> {
     try {
       let dateShift =

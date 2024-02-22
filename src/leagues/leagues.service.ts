@@ -14,7 +14,7 @@ export class LeaguesService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
   async fetchLeaguesAndSaveToDatabase(): Promise<any> {
     try {
       // Ensure the Apollo client is initialized
@@ -91,7 +91,7 @@ export class LeaguesService {
     }
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_DAY_AT_3AM)
   async deleteOldLeaguesFromDB(): Promise<void> {
     try {
       // calculate date two month ago
@@ -129,6 +129,32 @@ export class LeaguesService {
       this.logger.error(
         new Date().toLocaleString() +
           ' leagues.service ERROR getLeaguesFromDB:',
+        error,
+      )
+      return []
+    }
+  }
+
+  //get recent leagues without finished and trash leagues
+  async getRecentLeaguesFromDB(): Promise<any[]> {
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    const eighteenMonthsFromNow = new Date()
+    eighteenMonthsFromNow.setMonth(eighteenMonthsFromNow.getMonth() + 18)
+    try {
+      const leagues = await League.findAll({
+        where: {
+          endDateTime: {
+            [Op.gt]: weekAgo,
+            [Op.lt]: eighteenMonthsFromNow,
+          },
+        },
+      })
+      return leagues
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ' leagues.service ERROR getRecentLeaguesFromDB:',
         error,
       )
       return []

@@ -9,6 +9,11 @@ export class SqlReloaderController {
     return this.sqlReloerService.updateHeroesVersusDB()
   }
 
+  @Post('/heroeswithupdate')
+  async updateHeroesWithDB() {
+    return this.sqlReloerService.updateHeroesWithDB()
+  }
+
   @Post('/playersupdate')
   async updatePlayersDB() {
     return this.sqlReloerService.updatePlayersDB()
@@ -22,5 +27,10 @@ export class SqlReloaderController {
   @Post('/THupdate')
   async updateTeamHeroesDB() {
     return this.sqlReloerService.updateTeamHeroesDB()
+  }
+
+  @Post('/THVupdate')
+  async updateTeamHeroesVersusDB() {
+    return this.sqlReloerService.updateTeamHeroesVersusDB()
   }
 }

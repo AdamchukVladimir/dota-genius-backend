@@ -8,9 +8,11 @@ import { Logger } from 'winston' // logger to file
 @Injectable()
 export class SqlReloaderService {
   private HEROES_VERSUS_UPDATE_SQL: string
+  private HEROES_WITH_UPDATE_SQL: string
   private PLAYERS_UPDATE_SQL: string
   private TEAMS_UPDATE_SQL: string
   private TEAM_HEROES_UPDATE_SQL: string
+  private TEAM_HEROES_VERSUS_UPDATE_SQL: string
 
   constructor(
     private readonly sequelize: Sequelize,
@@ -21,6 +23,12 @@ export class SqlReloaderService {
         throw err
       }
       this.HEROES_VERSUS_UPDATE_SQL = data
+    })
+    fs.readFile('./src/SQL/queries/heroeswith.SQL', 'utf8', (err, data) => {
+      if (err) {
+        throw err
+      }
+      this.HEROES_WITH_UPDATE_SQL = data
     })
     fs.readFile('./src/SQL/queries/players.SQL', 'utf8', (err, data) => {
       if (err) {
@@ -40,6 +48,29 @@ export class SqlReloaderService {
       }
       this.TEAM_HEROES_UPDATE_SQL = data
     })
+    fs.readFile(
+      './src/SQL/queries/teamheroesversus.SQL',
+      'utf8',
+      (err, data) => {
+        if (err) {
+          throw err
+        }
+        this.TEAM_HEROES_VERSUS_UPDATE_SQL = data
+      },
+    )
+  }
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  async updateHeroesWithDB() {
+    try {
+      await this.sequelize.query(this.HEROES_WITH_UPDATE_SQL)
+      return 'good'
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ' sql_reloader.service Error updateHeroesWithDB:',
+        error,
+      )
+    }
   }
   @Cron(CronExpression.EVERY_DAY_AT_3AM)
   async updateHeroesVersusDB() {
@@ -73,6 +104,19 @@ export class SqlReloaderService {
       this.logger.error(
         new Date().toLocaleString() +
           ' sql_reloader.service Error updateTeamHeroesDB:',
+        error,
+      )
+    }
+  }
+  @Cron(CronExpression.EVERY_DAY_AT_7AM)
+  async updateTeamHeroesVersusDB() {
+    try {
+      await this.sequelize.query(this.TEAM_HEROES_VERSUS_UPDATE_SQL)
+      return 'good'
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ' sql_reloader.service Error updateTeamHeroesVersusDB:',
         error,
       )
     }
