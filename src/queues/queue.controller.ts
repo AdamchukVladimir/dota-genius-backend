@@ -19,4 +19,9 @@ export class QueueController {
   async getQueueInfo(): Promise<any> {
     return await this.queueService.getQueueInfo()
   }
+
+  @Get('jobs')
+  async getAllJobs(): Promise<any> {
+    return await this.queueService.getAllJobs()
+  }
 }

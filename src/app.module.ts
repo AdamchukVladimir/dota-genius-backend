@@ -15,6 +15,7 @@ import { QueueModule } from './queues/queue.module'
 import { Match } from './models/match.model'
 import { MatchesPlayers } from './models/matchesplayers.model'
 import { SqlReloaderModule } from './sql_reloader/sql_reloader.module'
+import { PredictionModule } from './prediction/prediction.module';
 
 @Module({
   controllers: [AppController],
@@ -47,7 +48,7 @@ import { SqlReloaderModule } from './sql_reloader/sql_reloader.module'
     ScheduleModule.forRoot(), // Cron scheduler
     MatchesModule,
     QueueModule, // Redis
-    SqlReloaderModule, // Reloader clear SQL queries
+    SqlReloaderModule, PredictionModule, // Reloader clear SQL queries
   ],
 })
 export class AppModule {}

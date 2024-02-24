@@ -55,7 +55,7 @@ export class QueueModule implements OnModuleInit {
       redis: redisConfig,
       limiter: {
         max: 1, // Count of jobs at the same time
-        duration: 20000, // Waiting time between jobs 20sec
+        duration: 3000, // Waiting time between jobs 1sec
       },
     }
 

@@ -68,4 +68,10 @@ export class QueueService {
   async getQueueInfo(): Promise<any> {
     return await this.queue.getJobCounts()
   }
+
+  async getAllJobs(): Promise<any[]> {
+    const jobs = await this.queue.getJobs(['delayed'])
+
+    return jobs.map((job) => job.toJSON())
+  }
 }
