@@ -10,4 +10,9 @@ export class PredictionController {
     const liveMatches = await this.predictionService.fetchAllLiveMatches()
     return liveMatches
   }
+
+  @Get('prediction')
+  async processPredictions(): Promise<any> {
+    return await this.predictionService.processPredictions()
+  }
 }

@@ -8,16 +8,16 @@ export const FETCH_LIVE_QUERY = gql`
           skip: 0
           take: 1000
           tiers: [
-            # UNSET
-            # PROFESSIONAL
-            # AMATEUR
-            # MINOR
-            # MAJOR
-            # INTERNATIONAL
-            # DPC_QUALIFIER
-            # DPC_LEAGUE_QUALIFIER
-            # DPC_LEAGUE
-            # DPC_LEAGUE_FINALS
+            UNSET
+            PROFESSIONAL
+            AMATEUR
+            MINOR
+            MAJOR
+            INTERNATIONAL
+            DPC_QUALIFIER
+            DPC_LEAGUE_QUALIFIER
+            DPC_LEAGUE
+            DPC_LEAGUE_FINALS
           ]
           isCompleted: false
         }

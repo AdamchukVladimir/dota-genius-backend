@@ -15,7 +15,8 @@ import { QueueModule } from './queues/queue.module'
 import { Match } from './models/match.model'
 import { MatchesPlayers } from './models/matchesplayers.model'
 import { SqlReloaderModule } from './sql_reloader/sql_reloader.module'
-import { PredictionModule } from './prediction/prediction.module';
+import { PredictionModule } from './prediction/prediction.module'
+import { Heroes } from './models/heroes.model'
 
 @Module({
   controllers: [AppController],
@@ -31,7 +32,7 @@ import { PredictionModule } from './prediction/prediction.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [Token, League, Match, MatchesPlayers], //import sequilize postgres model
+      models: [Token, League, Match, MatchesPlayers, Heroes], //import sequilize postgres model
       //autoLoadModels: true,
       //synchronize: true,
     }),
@@ -48,7 +49,8 @@ import { PredictionModule } from './prediction/prediction.module';
     ScheduleModule.forRoot(), // Cron scheduler
     MatchesModule,
     QueueModule, // Redis
-    SqlReloaderModule, PredictionModule, // Reloader clear SQL queries
+    SqlReloaderModule,
+    PredictionModule, // Reloader clear SQL queries
   ],
 })
 export class AppModule {}
