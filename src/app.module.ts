@@ -17,6 +17,8 @@ import { MatchesPlayers } from './models/matchesplayers.model'
 import { SqlReloaderModule } from './sql_reloader/sql_reloader.module'
 import { PredictionModule } from './prediction/prediction.module'
 import { Heroes } from './models/heroes.model'
+import { Predictions } from './models/predictions.model'
+import { HeroesWith } from './models/heroeswith.model'
 
 @Module({
   controllers: [AppController],
@@ -32,7 +34,15 @@ import { Heroes } from './models/heroes.model'
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRESS_DB,
-      models: [Token, League, Match, MatchesPlayers, Heroes], //import sequilize postgres model
+      models: [
+        Token,
+        League,
+        Match,
+        MatchesPlayers,
+        Heroes,
+        Predictions,
+        HeroesWith,
+      ], //import sequilize postgres model
       //autoLoadModels: true,
       //synchronize: true,
     }),

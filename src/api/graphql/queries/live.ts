@@ -41,7 +41,6 @@ export const FETCH_LIVE_QUERY = gql`
         radiantLead
         lobbyType
         serverSteamId
-        gameTime
         completed
         radiantTeamId
         direTeamId
@@ -49,6 +48,7 @@ export const FETCH_LIVE_QUERY = gql`
         gameState
         gameMinute
         gameTime
+        createdDateTime
         players {
           heroId
           hero {
