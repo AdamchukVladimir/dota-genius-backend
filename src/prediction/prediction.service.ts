@@ -25,6 +25,10 @@ export class PredictionService {
         const predictionHeroesSide =
           await this.calculatePredictionByHeroesRadiantOnly(match)
         const predictionHeroes = await this.calculatePredictionByHeroes(match)
+        const predictionHeroesWith =
+          await this.calculatePredictionByHeroesWith(match)
+        const predictionHeroesWithSides =
+          await this.calculatePredictionByHeroesWithSides(match)
 
         if (predictionHeroes) {
           return {
@@ -34,6 +38,8 @@ export class PredictionService {
             dire_team_id: match.direTeamId,
             predictionHeroes,
             predictionHeroesSide,
+            predictionHeroesWith,
+            predictionHeroesWithSides,
           }
         } else {
           return null
@@ -52,8 +58,11 @@ export class PredictionService {
       return nonNullPredictions
       //
       //return matches[0]
-      //return await this.calculatePredictionByHeroesWith(matches[3])
-      //return await this.getHeroesWithStatisticByMatch(matches[3])
+      //return await this.calculatePredictionByHeroesWith(matches[0])
+      //return await this.calculatePredictionByHeroesWithSides(matches[1])
+      //return await this.getHeroesWithStatisticByMatch(matches[0])
+      //return await this.calculatePredictionByHeroesRadiantOnly(matches[1])
+      //return await this.calculatePredictionByHeroes(matches[1])
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
@@ -72,9 +81,21 @@ export class PredictionService {
         dire_team_id: prediction.dire_team_id,
         prediction_heroes: prediction.predictionHeroes,
         prediction_heroes_sides: prediction.predictionHeroesSide,
+        prediction_heroes_with: prediction.predictionHeroesWith,
+        prediction_heroes_with_sides: prediction.predictionHeroesWithSides,
       }))
+      const fieldsToUpdate = [
+        'start_date_time',
+        'radiant_team_id',
+        'dire_team_id',
+        'prediction_heroes',
+        'prediction_heroes_sides',
+        'prediction_heroes_with',
+        'prediction_heroes_with_sides',
+      ]
+
       const options = {
-        ignoreDuplicates: true,
+        updateOnDuplicate: fieldsToUpdate,
       }
       await Predictions.bulkCreate(predictionToCreate, options)
     } catch (error) {
@@ -112,30 +133,42 @@ export class PredictionService {
         const heroes = matchHeroesStatistic[heroId]
 
         if (heroes) {
+          let heroesCount = 0
           const heroTotal = heroes.reduce((total, current) => {
-            if (parseInt(current.radiantmatchescount) > 10) {
-              return (
-                total +
-                (parseInt(current.radiantmatcheswin) /
-                  parseInt(current.radiantmatchescount) +
-                  parseInt(current.matcheswin) /
-                    parseInt(current.matchescount)) /
-                  2
-              )
+            if (
+              current &&
+              current.radiantmatchescount !== null &&
+              current.matchescount !== null
+            ) {
+              if (parseInt(current.radiantmatchescount) > 10) {
+                heroesCount++
+                return (
+                  total +
+                  (parseInt(current.radiantmatcheswin) /
+                    parseInt(current.radiantmatchescount) +
+                    parseInt(current.matcheswin) /
+                      parseInt(current.matchescount)) /
+                    2
+                )
+              } else if (parseInt(current.matchescount) > 10) {
+                heroesCount++
+                return (
+                  total +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount)
+                )
+              } else return total
+            } else {
+              return total
             }
-            return (
-              total +
-              parseInt(current.matcheswin) / parseInt(current.matchescount)
-            )
           }, 0)
 
-          totalSum += heroTotal / heroes.length
+          totalSum += heroTotal / heroesCount
           totalCount++
         }
       }
 
       const average = totalSum / totalCount
-
+      console.log('totalCount ' + totalCount)
       return average
     } catch (error) {
       this.logger.error(
@@ -155,21 +188,35 @@ export class PredictionService {
 
       for (const heroId in matchHeroesStatistic) {
         const heroes = matchHeroesStatistic[heroId]
+
         if (heroes) {
+          let heroesCount = 0
           const heroTotal = heroes.reduce((total, current) => {
-            if (parseInt(current.radiantmatchescount) > 10) {
-              return (
-                total +
-                parseInt(current.radiantmatcheswin) /
-                  parseInt(current.radiantmatchescount)
-              )
+            if (
+              current &&
+              current.radiantmatchescount !== null &&
+              current.matchescount !== null
+            ) {
+              if (parseInt(current.radiantmatchescount) > 10) {
+                heroesCount++
+                return (
+                  total +
+                  parseInt(current.radiantmatcheswin) /
+                    parseInt(current.radiantmatchescount)
+                )
+              } else if (parseInt(current.matchescount) > 10) {
+                heroesCount++
+                return (
+                  total +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount)
+                )
+              } else return total
+            } else {
+              return total
             }
-            return (
-              total +
-              parseInt(current.matcheswin) / parseInt(current.matchescount)
-            )
           }, 0)
-          totalSum += heroTotal / heroes.length
+
+          totalSum += heroTotal / heroesCount
           totalCount++
         }
       }
@@ -256,47 +303,149 @@ export class PredictionService {
     try {
       const matchHeroesWithStatistic =
         await this.getHeroesWithStatisticByMatch(match)
-      let totalSum = 0
-      let totalCount = 0
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantageHeroesWith = 0
 
-      for (const heroId in matchHeroesWithStatistic[0]) {
-        const heroes = matchHeroesWithStatistic[heroId]
-        console.log('heroes: ' + JSON.stringify(heroes))
-        if (heroes) {
-          const heroTotal = heroes.reduce((total, current) => {
-            console.log('current - ' + current.hero1 + ' ' + current.hero2)
-            console.log(
-              'avg - ' +
-                parseInt(current.matcheswin) / parseInt(current.matchescount),
+      //radiant
+
+      const radiantStatistic = matchHeroesWithStatistic[0]
+      if (radiantStatistic) {
+        const radiantTotal = radiantStatistic.reduce((total, current) => {
+          if (parseInt(current.radiantmatchescount) > 10) {
+            radiantTotalCount++
+            return (
+              total +
+              (parseInt(current.radiantmatcheswin) /
+                parseInt(current.radiantmatchescount) +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)) /
+                2
             )
-            // if (parseInt(current.radiantmatchescount) > 10) {
-            //   return (
-            //     total +
-            //     (parseInt(current.radiantmatcheswin) /
-            //       parseInt(current.radiantmatchescount) +
-            //       parseInt(current.matcheswin) /
-            //         parseInt(current.matchescount)) /
-            //       2
-            //   )
-            // }
+          } else if (parseInt(current.matchescount) > 10) {
+            radiantTotalCount++
             return (
               total +
               parseInt(current.matcheswin) / parseInt(current.matchescount)
             )
-          }, 0)
-
-          totalSum += heroTotal / heroes.length
-          totalCount++
-        }
+          } else return total
+        }, 0)
+        radiantTotalSum += radiantTotal / radiantTotalCount
       }
 
-      const average = totalSum / totalCount
+      //dire
+      const direStatistic = matchHeroesWithStatistic[1]
+      if (direStatistic) {
+        const direTotal = direStatistic.reduce((total, current) => {
+          if (parseInt(current.dirematchescount) > 10) {
+            direTotalCount++
+            return (
+              total +
+              (parseInt(current.dirematcheswin) /
+                parseInt(current.dirematchescount) +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)) /
+                2
+            )
+          } else if (parseInt(current.matchescount) > 10) {
+            direTotalCount++
+            return (
+              total +
+              parseInt(current.matcheswin) / parseInt(current.matchescount)
+            )
+          } else return total
+        }, 0)
+        direTotalSum += direTotal / direTotalCount
+      }
 
-      return average
+      advantageHeroesWith = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesWith
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
-          'prediction.service calculatePredictionByHeroes Error:',
+          'prediction.service calculatePredictionByHeroesWith Error:',
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByHeroesWithSides(match: any): Promise<any> {
+    try {
+      const matchHeroesWithStatistic =
+        await this.getHeroesWithStatisticByMatch(match)
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantageHeroesWith = 0
+
+      //radiant
+
+      const radiantStatistic = matchHeroesWithStatistic[0]
+      if (radiantStatistic) {
+        const radiantTotal = radiantStatistic.reduce((total, current) => {
+          if (
+            current &&
+            current.radiantmatchescount !== null &&
+            current.matchescount !== null
+          ) {
+            if (parseInt(current.radiantmatchescount) > 10) {
+              radiantTotalCount++
+              return (
+                total +
+                parseInt(current.radiantmatcheswin) /
+                  parseInt(current.radiantmatchescount)
+              )
+            } else if (parseInt(current.matchescount) > 10) {
+              radiantTotalCount++
+              return (
+                total +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)
+              )
+            } else return total
+          } else {
+            return total
+          }
+        }, 0)
+        radiantTotalSum += radiantTotal / radiantTotalCount
+      }
+
+      //dire
+      const direStatistic = matchHeroesWithStatistic[1]
+      if (direStatistic) {
+        const direTotal = direStatistic.reduce((total, current) => {
+          if (
+            current &&
+            current.radiantmatchescount !== null &&
+            current.matchescount !== null
+          ) {
+            if (parseInt(current.dirematchescount) > 10) {
+              direTotalCount++
+              return (
+                total +
+                parseInt(current.dirematcheswin) /
+                  parseInt(current.dirematchescount)
+              )
+            } else if (parseInt(current.matchescount) > 10) {
+              direTotalCount++
+              return (
+                total +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)
+              )
+            } else return total
+          } else {
+            return total
+          }
+        }, 0)
+        direTotalSum += direTotal / direTotalCount
+      }
+
+      advantageHeroesWith = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesWith
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByHeroesWith Error:',
         error,
       )
     }

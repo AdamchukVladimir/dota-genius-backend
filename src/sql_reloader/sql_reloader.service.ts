@@ -7,6 +7,7 @@ import { Logger } from 'winston' // logger to file
 
 @Injectable()
 export class SqlReloaderService {
+  private HEROES_AVG_UPDATE_SQL: string
   private HEROES_VERSUS_UPDATE_SQL: string
   private HEROES_WITH_UPDATE_SQL: string
   private PLAYERS_UPDATE_SQL: string
@@ -18,6 +19,12 @@ export class SqlReloaderService {
     private readonly sequelize: Sequelize,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {
+    fs.readFile('./src/SQL/queries/heroesavg.SQL', 'utf8', (err, data) => {
+      if (err) {
+        throw err
+      }
+      this.HEROES_AVG_UPDATE_SQL = data
+    })
     fs.readFile('./src/SQL/queries/heroes.SQL', 'utf8', (err, data) => {
       if (err) {
         throw err
@@ -58,6 +65,19 @@ export class SqlReloaderService {
         this.TEAM_HEROES_VERSUS_UPDATE_SQL = data
       },
     )
+  }
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async updateHeroesAVG() {
+    try {
+      await this.sequelize.query(this.HEROES_AVG_UPDATE_SQL)
+      return 'good'
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ' sql_reloader.service Error updateHeroesWithDB:',
+        error,
+      )
+    }
   }
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
   async updateHeroesWithDB() {
