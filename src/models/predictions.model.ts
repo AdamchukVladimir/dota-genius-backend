@@ -48,6 +48,18 @@ export class Predictions extends Model {
     type: DataType.REAL,
     allowNull: true,
   })
+  prediction_heroes_avg: number
+
+  @Column({
+    type: DataType.REAL,
+    allowNull: true,
+  })
+  prediction_heroes_avg_sides: number
+
+  @Column({
+    type: DataType.REAL,
+    allowNull: true,
+  })
   prediction_heroes: number
 
   @Column({

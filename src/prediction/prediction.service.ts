@@ -8,6 +8,7 @@ import { Heroes } from 'src/models/heroes.model'
 import { Op } from 'sequelize'
 import { Predictions } from 'src/models/predictions.model'
 import { HeroesWith } from 'src/models/heroeswith.model'
+import { HeroesAVG } from 'src/models/heroesavg.model'
 
 @Injectable()
 export class PredictionService {
@@ -22,6 +23,10 @@ export class PredictionService {
       const matches = allLiveMatches.data.live.matches
       //
       const getPredictions = async (match: any) => {
+        const predictionHeroesAVG =
+          await this.calculatePredictionByHeroesAVG(match)
+        const predictionHeroesAVGSides =
+          await this.calculatePredictionByHeroesAVGSides(match)
         const predictionHeroesSide =
           await this.calculatePredictionByHeroesRadiantOnly(match)
         const predictionHeroes = await this.calculatePredictionByHeroes(match)
@@ -36,6 +41,8 @@ export class PredictionService {
             start_date_time: match.createdDateTime,
             radiant_team_id: match.radiantTeamId,
             dire_team_id: match.direTeamId,
+            predictionHeroesAVG,
+            predictionHeroesAVGSides,
             predictionHeroes,
             predictionHeroesSide,
             predictionHeroesWith,
@@ -63,6 +70,9 @@ export class PredictionService {
       //return await this.getHeroesWithStatisticByMatch(matches[0])
       //return await this.calculatePredictionByHeroesRadiantOnly(matches[1])
       //return await this.calculatePredictionByHeroes(matches[1])
+      //return await this.getHeroesWithStatisticByMatch(matches[2])
+      //return await this.calculatePredictionByHeroesAVG(matches[0])
+      //return await this.getHeroesAVGStatisticByMatch(matches[0])
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
@@ -79,6 +89,8 @@ export class PredictionService {
         start_date_time: prediction.start_date_time,
         radiant_team_id: prediction.radiant_team_id,
         dire_team_id: prediction.dire_team_id,
+        prediction_heroes_avg: prediction.predictionHeroesAVG,
+        prediction_heroes_avg_sides: prediction.predictionHeroesAVGSides,
         prediction_heroes: prediction.predictionHeroes,
         prediction_heroes_sides: prediction.predictionHeroesSide,
         prediction_heroes_with: prediction.predictionHeroesWith,
@@ -88,6 +100,8 @@ export class PredictionService {
         'start_date_time',
         'radiant_team_id',
         'dire_team_id',
+        'prediction_heroes_avg',
+        'prediction_heroes_avg_sides',
         'prediction_heroes',
         'prediction_heroes_sides',
         'prediction_heroes_with',
@@ -294,6 +308,229 @@ export class PredictionService {
       this.logger.error(
         new Date().toLocaleString() +
           ` prediction.service getStatisticByRadiantAndDireHeroes Error :`,
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByHeroesAVGSides(match: any): Promise<any> {
+    try {
+      const matchHeroesAVGStatistic =
+        await this.getHeroesAVGStatisticByMatch(match)
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantageHeroesAVG = 0
+
+      //radiant
+
+      const radiantStatistic = matchHeroesAVGStatistic[0]
+      console.log('radiantStatistic - ' + JSON.stringify(radiantStatistic))
+      if (radiantStatistic) {
+        const radiantTotal = radiantStatistic.reduce((total, current) => {
+          if (parseInt(current.radiant_matches_count) > 10) {
+            radiantTotalCount++
+            console.log(
+              'radiant - ' +
+                current.hero_id +
+                ' ' +
+                parseInt(current.radiant_matches_win) /
+                  parseInt(current.radiant_matches_count),
+            )
+            return (
+              total +
+              parseInt(current.radiant_matches_win) /
+                parseInt(current.radiant_matches_count)
+            )
+          } else if (parseInt(current.matches_count) > 10) {
+            radiantTotalCount++
+            return (
+              total +
+              parseInt(current.matches_win) / parseInt(current.matches_count)
+            )
+          } else return total
+        }, 0)
+        radiantTotalSum += radiantTotal / radiantTotalCount
+      }
+
+      //dire
+      const direStatistic = matchHeroesAVGStatistic[1]
+      if (direStatistic) {
+        const direTotal = direStatistic.reduce((total, current) => {
+          if (parseInt(current.dire_matches_count) > 10) {
+            direTotalCount++
+            console.log(
+              'dire - ' +
+                current.hero_id +
+                ' ' +
+                parseInt(current.dire_matches_win) /
+                  parseInt(current.dire_matches_count),
+            )
+            return (
+              total +
+              parseInt(current.dire_matches_win) /
+                parseInt(current.dire_matches_count)
+            )
+          } else if (parseInt(current.matches_count) > 10) {
+            direTotalCount++
+            return (
+              total +
+              parseInt(current.matches_win) / parseInt(current.matches_count)
+            )
+          } else return total
+        }, 0)
+        direTotalSum += direTotal / direTotalCount
+      }
+
+      advantageHeroesAVG = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesAVG
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByHeroesAVGSides Error:',
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByHeroesAVG(match: any): Promise<any> {
+    try {
+      const matchHeroesAVGStatistic =
+        await this.getHeroesAVGStatisticByMatch(match)
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantageHeroesAVG = 0
+
+      //radiant
+
+      const radiantStatistic = matchHeroesAVGStatistic[0]
+      console.log('radiantStatistic - ' + JSON.stringify(radiantStatistic))
+      if (radiantStatistic) {
+        const radiantTotal = radiantStatistic.reduce((total, current) => {
+          if (parseInt(current.radiant_matches_count) > 10) {
+            radiantTotalCount++
+            console.log(
+              'radiant - ' +
+                current.hero_id +
+                ' ' +
+                parseInt(current.radiant_matches_win) /
+                  parseInt(current.radiant_matches_count),
+            )
+            return (
+              total +
+              (parseInt(current.radiant_matches_win) /
+                parseInt(current.radiant_matches_count) +
+                parseInt(current.matches_win) /
+                  parseInt(current.matches_count)) /
+                2
+            )
+          } else if (parseInt(current.matches_count) > 10) {
+            radiantTotalCount++
+            return (
+              total +
+              parseInt(current.matches_win) / parseInt(current.matches_count)
+            )
+          } else return total
+        }, 0)
+        radiantTotalSum += radiantTotal / radiantTotalCount
+      }
+
+      //dire
+      const direStatistic = matchHeroesAVGStatistic[1]
+      if (direStatistic) {
+        const direTotal = direStatistic.reduce((total, current) => {
+          if (parseInt(current.dire_matches_count) > 10) {
+            direTotalCount++
+            console.log(
+              'dire - ' +
+                current.hero_id +
+                ' ' +
+                parseInt(current.dire_matches_win) /
+                  parseInt(current.dire_matches_count),
+            )
+            return (
+              total +
+              (parseInt(current.dire_matches_win) /
+                parseInt(current.dire_matches_count) +
+                parseInt(current.matches_win) /
+                  parseInt(current.matches_count)) /
+                2
+            )
+          } else if (parseInt(current.matches_count) > 10) {
+            direTotalCount++
+            return (
+              total +
+              parseInt(current.matches_win) / parseInt(current.matches_count)
+            )
+          } else return total
+        }, 0)
+        direTotalSum += direTotal / direTotalCount
+      }
+
+      advantageHeroesAVG = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesAVG
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByHeroesAVGSides Error:',
+        error,
+      )
+    }
+  }
+  async getHeroesAVGStatisticByMatch(match: any): Promise<any> {
+    try {
+      const radiantHeroesIds: number[] = match.players
+        .filter((player: any) => player.isRadiant === true)
+        .map((player: any) => player.heroId)
+
+      const direHeroesIds: number[] = match.players
+        .filter((player: any) => player.isRadiant === false)
+        .map((player: any) => player.heroId)
+
+      let heroesAVGStatisticByRadiantHero: any[] = []
+      for (const radiantId of radiantHeroesIds) {
+        const promises: Promise<any>[] = []
+        promises.push(this.getStatisticByHeroesAVG(radiantId))
+        const results = await Promise.all(promises)
+        heroesAVGStatisticByRadiantHero.push(...results)
+      }
+
+      let heroesAVGStatisticByDireHero: any[] = []
+      for (const direId of direHeroesIds) {
+        const promises: Promise<any>[] = []
+        promises.push(this.getStatisticByHeroesAVG(direId))
+        const results = await Promise.all(promises)
+        heroesAVGStatisticByDireHero.push(...results)
+      }
+
+      return [heroesAVGStatisticByRadiantHero, heroesAVGStatisticByDireHero]
+      //return [...radiantHeroesIds, ...direHeroesIds]
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service calculatePredictionByHeroes Error :`,
+        error,
+      )
+    }
+  }
+
+  async getStatisticByHeroesAVG(heroId: number): Promise<any> {
+    try {
+      const heroAVGStatisticRecord = await HeroesAVG.findOne({
+        where: {
+          hero_id: {
+            [Op.eq]: heroId,
+          },
+        },
+      })
+      return heroAVGStatisticRecord
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getStatisticByHeroesAVG Error :`,
         error,
       )
     }

@@ -217,7 +217,7 @@ export class MatchesService {
       if (!match) {
         this.logger.error(
           new Date().toLocaleString() +
-            ` match.service ERROR fetchMatchDetails: Match with id ${matchFull.id} not found.`,
+            ` match.service ERROR saveMatchDetailsToDB: Match with id ${matchFull.id} not found.`,
         )
       }
 
@@ -232,16 +232,68 @@ export class MatchesService {
       match.direteamid = matchFull.direTeamId
       match.direteamname = matchFull.direTeam.name
       match.seriestype = matchFull.series.type
-      match.radianthero1 = matchFull.players[0].hero.id
-      match.radianthero2 = matchFull.players[1].hero.id
-      match.radianthero3 = matchFull.players[2].hero.id
-      match.radianthero4 = matchFull.players[3].hero.id
-      match.radianthero5 = matchFull.players[4].hero.id
-      match.direhero1 = matchFull.players[5].hero.id
-      match.direhero2 = matchFull.players[6].hero.id
-      match.direhero3 = matchFull.players[7].hero.id
-      match.direhero4 = matchFull.players[8].hero.id
-      match.direhero5 = matchFull.players[9].hero.id
+      // match.radianthero1 = matchFull.players[0].hero.id
+      // match.radianthero2 = matchFull.players[1].hero.id
+      // match.radianthero3 = matchFull.players[2].hero.id
+      // match.radianthero4 = matchFull.players[3].hero.id
+      // match.radianthero5 = matchFull.players[4].hero.id
+      // match.direhero1 = matchFull.players[5].hero.id
+      // match.direhero2 = matchFull.players[6].hero.id
+      // match.direhero3 = matchFull.players[7].hero.id
+      // match.direhero4 = matchFull.players[8].hero.id
+      // match.direhero5 = matchFull.players[9].hero.id
+
+      match.radianthero1 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_1',
+        'radiant',
+      )
+      match.radianthero2 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_2',
+        'radiant',
+      )
+      match.radianthero3 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_3',
+        'radiant',
+      )
+      match.radianthero4 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_4',
+        'radiant',
+      )
+      match.radianthero5 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_5',
+        'radiant',
+      )
+
+      match.direhero1 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_1',
+        'dire',
+      )
+      match.direhero2 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_2',
+        'dire',
+      )
+      match.direhero3 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_3',
+        'dire',
+      )
+      match.direhero4 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_4',
+        'dire',
+      )
+      match.direhero5 = this.getHeroIdByPosition(
+        matchFull,
+        'POSITION_5',
+        'dire',
+      )
 
       await match.save()
       return match
@@ -250,6 +302,28 @@ export class MatchesService {
         new Date().toLocaleString() +
           ' match.service ERROR saveMatchDetailsToDB: ' +
           JSON.stringify(matchFull),
+        error,
+      )
+    }
+  }
+
+  private getHeroIdByPosition(matchFull: any, position: string, team: string) {
+    try {
+      console.log('matchFull.players ' + matchFull.players)
+      console.log('position ' + position)
+      console.log('team ' + team)
+      const isRadiant = team === 'radiant' ? true : false
+      const player = matchFull.players.find(
+        (player: any) =>
+          player.position === position && player.isRadiant === isRadiant,
+      )
+      console.log('player ' + player)
+      return player ? player.hero.id : null
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ' match.service ERROR getHeroIdByPosition: ' +
+          position,
         error,
       )
     }

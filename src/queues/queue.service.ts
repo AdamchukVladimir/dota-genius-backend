@@ -48,11 +48,6 @@ export class QueueService {
   async processReloadMatchDetailsTask(matchId: number): Promise<void> {
     try {
       const matchFull = await this.MatchesService.fetchMatchDetails(matchId)
-      this.logger.info(
-        new Date().toLocaleString() +
-          ' queue.service processReloadMatchDetailsTask. matchFull: ' +
-          matchFull,
-      )
       await this.MatchesService.saveMatchDetailsToDB(matchFull)
 
       await this.MatchesService.saveMatchPlayerToDB(matchFull)

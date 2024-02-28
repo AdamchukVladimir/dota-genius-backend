@@ -19,6 +19,7 @@ import { PredictionModule } from './prediction/prediction.module'
 import { Heroes } from './models/heroes.model'
 import { Predictions } from './models/predictions.model'
 import { HeroesWith } from './models/heroeswith.model'
+import { HeroesAVG } from './models/heroesavg.model'
 
 @Module({
   controllers: [AppController],
@@ -42,6 +43,7 @@ import { HeroesWith } from './models/heroeswith.model'
         Heroes,
         Predictions,
         HeroesWith,
+        HeroesAVG,
       ], //import sequilize postgres model
       //autoLoadModels: true,
       //synchronize: true,
