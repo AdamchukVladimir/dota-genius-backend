@@ -56,6 +56,66 @@ export class HeroesAVG extends Model {
   })
   dire_matches_win: number
 
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_1_matchescount: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_1_matcheswin: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_2_matchescount: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_2_matcheswin: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_3_matchescount: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_3_matcheswin: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_4_matchescount: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_4_matcheswin: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_5_matchescount: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  position_5_matcheswin: number
+
   @CreatedAt
   @Column({
     type: DataType.DATE,

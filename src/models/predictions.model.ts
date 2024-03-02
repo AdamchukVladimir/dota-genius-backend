@@ -84,7 +84,7 @@ export class Predictions extends Model {
     type: DataType.REAL,
     allowNull: true,
   })
-  prediction_positions: number
+  prediction_heroes_positions: number
 
   @Column({
     type: DataType.REAL,
@@ -97,6 +97,12 @@ export class Predictions extends Model {
     allowNull: true,
   })
   prediction_team_vs_team: number
+
+  @Column({
+    type: DataType.REAL,
+    allowNull: true,
+  })
+  prediction_players_positions: number
 
   @Column({
     type: DataType.REAL,

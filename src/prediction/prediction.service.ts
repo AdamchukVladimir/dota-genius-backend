@@ -34,6 +34,8 @@ export class PredictionService {
           await this.calculatePredictionByHeroesWith(match)
         const predictionHeroesWithSides =
           await this.calculatePredictionByHeroesWithSides(match)
+        const predictionHeroesPositions =
+          await this.calculatePredictionByHeroesAVGPositions(match)
 
         if (predictionHeroes) {
           return {
@@ -47,6 +49,7 @@ export class PredictionService {
             predictionHeroesSide,
             predictionHeroesWith,
             predictionHeroesWithSides,
+            predictionHeroesPositions,
           }
         } else {
           return null
@@ -73,6 +76,7 @@ export class PredictionService {
       //return await this.getHeroesWithStatisticByMatch(matches[2])
       //return await this.calculatePredictionByHeroesAVG(matches[0])
       //return await this.getHeroesAVGStatisticByMatch(matches[0])
+      //return await this.calculatePredictionByHeroesAVGPositions(matches[0])
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
@@ -95,6 +99,7 @@ export class PredictionService {
         prediction_heroes_sides: prediction.predictionHeroesSide,
         prediction_heroes_with: prediction.predictionHeroesWith,
         prediction_heroes_with_sides: prediction.predictionHeroesWithSides,
+        prediction_heroes_positions: prediction.predictionHeroesPositions,
       }))
       const fieldsToUpdate = [
         'start_date_time',
@@ -106,6 +111,7 @@ export class PredictionService {
         'prediction_heroes_sides',
         'prediction_heroes_with',
         'prediction_heroes_with_sides',
+        'prediction_heroes_positions',
       ]
 
       const options = {
@@ -308,6 +314,70 @@ export class PredictionService {
       this.logger.error(
         new Date().toLocaleString() +
           ` prediction.service getStatisticByRadiantAndDireHeroes Error :`,
+        error,
+      )
+    }
+  }
+
+  getPositionByHero(players: any[], heroId: number): string {
+    console.log(
+      'getPositionByHero ' + JSON.stringify(players[0].heroId) + ' ' + heroId,
+    )
+    const player = players.find((player) => player.heroId == heroId)
+    console.log('player ' + player.position)
+    if (!player) return ''
+    return player.position
+  }
+
+  async calculatePredictionByHeroesAVGPositions(match: any): Promise<any> {
+    try {
+      const matchHeroesAVGStatistic =
+        await this.getHeroesAVGStatisticByMatch(match)
+      if (matchHeroesAVGStatistic.length !== 2) return [0, 0]
+
+      const sumBySide = (sideData, sideSum) => {
+        let totalSum = 0
+        let totalCount = 0
+
+        for (let i = 0; i < sideData.length; i++) {
+          const current = sideData[i]
+          const position = this.getPositionByHero(
+            match.players,
+            current.hero_id,
+          )
+          const positionData =
+            current[`position_${position.slice(-1)}_matchescount`]
+          const winData = current[`position_${position.slice(-1)}_matcheswin`]
+
+          if (parseFloat(positionData) > 10) {
+            totalCount++
+            totalSum += parseFloat(winData) / parseFloat(positionData)
+            console.log(
+              'current id ' +
+                current.hero_id +
+                ' position ' +
+                position +
+                ' positionData ' +
+                positionData +
+                ' win ' +
+                winData +
+                ' winrate ' +
+                parseFloat(winData) / parseFloat(positionData),
+            )
+          }
+        }
+        return sideSum + (totalCount ? totalSum / totalCount : 0)
+      }
+
+      let radiantTotalSum = sumBySide(matchHeroesAVGStatistic[0], 0)
+      let direTotalSum = sumBySide(matchHeroesAVGStatistic[1], 0)
+
+      const advantageHeroesAVG = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesAVG
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByHeroesAVGSides Error:',
         error,
       )
     }

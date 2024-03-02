@@ -58,7 +58,6 @@ export const FETCH_LIVE_QUERY = gql`
           name
           steamAccountId
           isRadiant
-          position
           numLastHits
           networth
           numKills

@@ -38,7 +38,7 @@ export class MatchesService {
       )
     }
   }
-  @Cron(CronExpression.EVERY_DAY_AT_4AM)
+  //@Cron(CronExpression.EVERY_DAY_AT_4AM)
   async processReloadMatchesDetails(): Promise<void> {
     try {
       const matchesEmpty = await this.getMatchesFromDB()
@@ -232,16 +232,6 @@ export class MatchesService {
       match.direteamid = matchFull.direTeamId
       match.direteamname = matchFull.direTeam.name
       match.seriestype = matchFull.series.type
-      // match.radianthero1 = matchFull.players[0].hero.id
-      // match.radianthero2 = matchFull.players[1].hero.id
-      // match.radianthero3 = matchFull.players[2].hero.id
-      // match.radianthero4 = matchFull.players[3].hero.id
-      // match.radianthero5 = matchFull.players[4].hero.id
-      // match.direhero1 = matchFull.players[5].hero.id
-      // match.direhero2 = matchFull.players[6].hero.id
-      // match.direhero3 = matchFull.players[7].hero.id
-      // match.direhero4 = matchFull.players[8].hero.id
-      // match.direhero5 = matchFull.players[9].hero.id
 
       match.radianthero1 = this.getHeroIdByPosition(
         matchFull,
