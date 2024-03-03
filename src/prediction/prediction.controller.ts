@@ -15,4 +15,9 @@ export class PredictionController {
   async processPredictions(): Promise<any> {
     return await this.predictionService.processPredictions()
   }
+
+  @Get('test')
+  async testProcessPredictions(): Promise<any> {
+    return await this.predictionService.testProcessPredictions()
+  }
 }

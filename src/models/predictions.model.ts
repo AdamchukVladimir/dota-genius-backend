@@ -96,6 +96,12 @@ export class Predictions extends Model {
     type: DataType.REAL,
     allowNull: true,
   })
+  prediction_team_heroes_versus: number
+
+  @Column({
+    type: DataType.REAL,
+    allowNull: true,
+  })
   prediction_team_vs_team: number
 
   @Column({
