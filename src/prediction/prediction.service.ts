@@ -12,6 +12,8 @@ import { HeroesAVG } from 'src/models/heroesavg.model'
 import { TeamHeroes } from 'src/models/teamheroes.model'
 import { TeamHeroesVersus } from 'src/models/teamheroesversus.model'
 import { MATCH_DETAILS_QUERY } from 'src/api/graphql/queries/matchDetails'
+import { Team } from 'src/models/teams.model'
+import { TeamsVsTeams } from 'src/models/temsvsteams.model'
 
 @Injectable()
 export class PredictionService {
@@ -76,7 +78,7 @@ export class PredictionService {
 
       return nonNullPredictions
       //
-      //return matches[1]
+      //return matches[0]
       //return await this.calculatePredictionByHeroesWith(matches[0])
       //return await this.calculatePredictionByHeroesWithSides(matches[1])
       //return await this.getHeroesWithStatisticByMatch(matches[0])
@@ -89,7 +91,8 @@ export class PredictionService {
       //return await this.calculatePredictionByTeamHeroes(matches[2])
       //return await this.getTeamHeroesStatisticByMatch(matches[2])
       //return await this.getTeamHeroesVersusStatisticByMatch(matches[1])
-      return await this.calculatePredictionByTeamHeroesVersus(matches[0])
+      //return await this.calculatePredictionByTeamHeroesVersus(matches[0])
+      return await this.calculatePredictionByTeamVsTeam(matches[0])
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
@@ -1202,6 +1205,143 @@ export class PredictionService {
       this.logger.error(
         new Date().toLocaleString() +
           ` prediction.service getStatisticByTeamHeroesVersus Error :`,
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByTeamsAVG(match: any): Promise<any> {
+    try {
+      const radiantStatistic = await this.getStatisticByTeamAVG(
+        match.radiantTeamId,
+      )
+      const direStatistic = await this.getStatisticByTeamAVG(match.direTeamId)
+      let radiantTotalSum = 0
+      let direTotalSum = 0
+      let advantageHeroesAVG = 0
+
+      //radiant
+
+      if (radiantStatistic) {
+        if (parseInt(radiantStatistic.radiantmatchescount) > 10) {
+          radiantTotalSum =
+            (parseInt(radiantStatistic.radiantmatcheswin) /
+              parseInt(radiantStatistic.radiantmatchescount) +
+              parseInt(radiantStatistic.matcheswin) /
+                parseInt(radiantStatistic.matchescount)) /
+            2
+        } else if (parseInt(radiantStatistic.matchescount) > 10) {
+          radiantTotalSum =
+            parseInt(radiantStatistic.matcheswin) /
+            parseInt(radiantStatistic.matchescount)
+        }
+      }
+
+      //dire
+      if (direStatistic) {
+        if (parseInt(direStatistic.dirematchescount) > 10) {
+          direTotalSum =
+            (parseInt(direStatistic.dirematcheswin) /
+              parseInt(direStatistic.dirematchescount) +
+              parseInt(direStatistic.matcheswin) /
+                parseInt(direStatistic.matchescount)) /
+            2
+        } else if (parseInt(direStatistic.matchescount) > 10) {
+          direTotalSum =
+            parseInt(direStatistic.matcheswin) /
+            parseInt(direStatistic.matchescount)
+        }
+      }
+
+      advantageHeroesAVG = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesAVG
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByTeamsAVG Error:',
+        error,
+      )
+    }
+  }
+
+  async getStatisticByTeamAVG(teamid: number): Promise<any> {
+    try {
+      const teamStatisticRecord = await Team.findOne({
+        where: {
+          teamid: {
+            [Op.eq]: teamid,
+          },
+        },
+      })
+      return teamStatisticRecord
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getStatisticByTeamAVG Error :`,
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByTeamVsTeam(match: any): Promise<any> {
+    try {
+      const teamVsTeamStatistic = await this.getStatisticByTeamVSTeam(
+        match.radiantTeamId,
+        match.direTeamId,
+      )
+      let TotalSum = 0.5
+
+      if (teamVsTeamStatistic) {
+        if (parseInt(teamVsTeamStatistic.radiantmatchescount) > 10) {
+          TotalSum =
+            (parseInt(teamVsTeamStatistic.radiantmatcheswin) /
+              parseInt(teamVsTeamStatistic.radiantmatchescount) +
+              parseInt(teamVsTeamStatistic.matcheswin) /
+                parseInt(teamVsTeamStatistic.matchescount)) /
+            2
+        } else if (parseInt(teamVsTeamStatistic.matchescount) > 10) {
+          TotalSum =
+            parseInt(teamVsTeamStatistic.matcheswin) /
+            parseInt(teamVsTeamStatistic.matchescount)
+        }
+      }
+
+      return TotalSum
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByTeamVsTeam Error:',
+        error,
+      )
+    }
+  }
+
+  async getStatisticByTeamVSTeam(
+    team1id: number,
+    team2id: number,
+  ): Promise<any> {
+    try {
+      const teamVsTeamStatisticRecord = await TeamsVsTeams.findOne({
+        where: {
+          [Op.and]: [
+            {
+              team1id: {
+                [Op.eq]: team1id,
+              },
+            },
+            {
+              team2id: {
+                [Op.eq]: team2id,
+              },
+            },
+          ],
+        },
+      })
+      return teamVsTeamStatisticRecord
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getStatisticByTeamVSTeam Error :`,
         error,
       )
     }

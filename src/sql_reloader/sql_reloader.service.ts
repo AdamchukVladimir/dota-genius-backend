@@ -14,6 +14,7 @@ export class SqlReloaderService {
   private TEAMS_UPDATE_SQL: string
   private TEAM_HEROES_UPDATE_SQL: string
   private TEAM_HEROES_VERSUS_UPDATE_SQL: string
+  private TEAM_VS_TEAM_UPDATE_SQL: string
 
   constructor(
     private readonly sequelize: Sequelize,
@@ -65,16 +66,23 @@ export class SqlReloaderService {
         this.TEAM_HEROES_VERSUS_UPDATE_SQL = data
       },
     )
+    fs.readFile('./src/SQL/queries/teamsvsteams.SQL', 'utf8', (err, data) => {
+      if (err) {
+        throw err
+      }
+      this.TEAM_VS_TEAM_UPDATE_SQL = data
+    })
   }
+
   @Cron(CronExpression.EVERY_DAY_AT_1AM)
-  async updateHeroesAVG() {
+  async updateHeroesAVGDB() {
     try {
       await this.sequelize.query(this.HEROES_AVG_UPDATE_SQL)
       return 'good'
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
-          ' sql_reloader.service Error updateHeroesWithDB:',
+          ' sql_reloader.service Error updateHeroesAVGDB:',
         error,
       )
     }
@@ -137,6 +145,19 @@ export class SqlReloaderService {
       this.logger.error(
         new Date().toLocaleString() +
           ' sql_reloader.service Error updateTeamHeroesVersusDB:',
+        error,
+      )
+    }
+  }
+  @Cron(CronExpression.EVERY_DAY_AT_8AM)
+  async updateTeamsVSTeamsDB() {
+    try {
+      await this.sequelize.query(this.TEAM_VS_TEAM_UPDATE_SQL)
+      return 'good'
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ' sql_reloader.service Error updateTeamsVSTeamsDB:',
         error,
       )
     }

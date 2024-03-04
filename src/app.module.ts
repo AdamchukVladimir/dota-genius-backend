@@ -22,6 +22,9 @@ import { HeroesWith } from './models/heroeswith.model'
 import { HeroesAVG } from './models/heroesavg.model'
 import { TeamHeroes } from './models/teamheroes.model'
 import { TeamHeroesVersus } from './models/teamheroesversus.model'
+import { TeamsVsTeams } from './models/temsvsteams.model'
+import { Team } from './models/teams.model'
+import { Players } from './models/players.model'
 
 @Module({
   controllers: [AppController],
@@ -48,6 +51,9 @@ import { TeamHeroesVersus } from './models/teamheroesversus.model'
         HeroesAVG,
         TeamHeroes,
         TeamHeroesVersus,
+        TeamsVsTeams,
+        Team,
+        Players,
       ], //import sequilize postgres model
       //autoLoadModels: true,
       //synchronize: true,
