@@ -191,7 +191,9 @@ export class MatchesService {
         seriestype: matchFull.series.type,
         startdatetime: matchFull.startDateTime,
         firstbloodtime: matchFull.firstBloodTime,
-        nickname: player.steamAccount.name,
+        //nickname: player.steamAccount.name,
+        nickname:
+          player.steamAccount?.proSteamAccount.name || player.steamAccount.name,
       }))
 
       await MatchesPlayers.bulkCreate(dataToCreate)

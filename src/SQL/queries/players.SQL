@@ -50,7 +50,7 @@ SELECT
     count(CASE WHEN mp.isRadiant='true' AND mp.isVictory='true' THEN 1 END) as radiant_matcheswin,
     count(CASE WHEN mp.isRadiant='false' THEN 1 END) as dire_matchescount,
     count(CASE WHEN mp.isRadiant='false' AND mp.isVictory='true' THEN 1 END) as dire_matcheswin,
-    mp.nickname
+    MODE() WITHIN GROUP (ORDER BY mp.nickname) AS nickname
 FROM 
     matchesPlayers mp
 LEFT JOIN 
@@ -58,5 +58,4 @@ LEFT JOIN
 WHERE 
     NOT EXISTS (SELECT 1 FROM players WHERE players.steamAccountId = mp.steamAccountId)
 GROUP BY 
-    mp.steamAccountId,
-    mp.nickname;
+    mp.steamAccountId;

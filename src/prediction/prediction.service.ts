@@ -14,6 +14,7 @@ import { TeamHeroesVersus } from 'src/models/teamheroesversus.model'
 import { MATCH_DETAILS_QUERY } from 'src/api/graphql/queries/matchDetails'
 import { Team } from 'src/models/teams.model'
 import { TeamsVsTeams } from 'src/models/temsvsteams.model'
+import { Players } from 'src/models/players.model'
 
 @Injectable()
 export class PredictionService {
@@ -27,58 +28,70 @@ export class PredictionService {
       const allLiveMatches = await this.fetchAllLiveMatches() // Fetches data as a promise
       const matches = allLiveMatches.data.live.matches
 
-      const getPredictions = async (match: any) => {
-        const predictionHeroesAVG =
-          await this.calculatePredictionByHeroesAVG(match)
-        const predictionHeroesAVGSides =
-          await this.calculatePredictionByHeroesAVGSides(match)
-        const predictionHeroesSide =
-          await this.calculatePredictionByHeroesRadiantOnly(match)
-        const predictionHeroes = await this.calculatePredictionByHeroes(match)
-        const predictionHeroesWith =
-          await this.calculatePredictionByHeroesWith(match)
-        const predictionHeroesWithSides =
-          await this.calculatePredictionByHeroesWithSides(match)
-        const predictionHeroesPositions =
-          await this.calculatePredictionByHeroesAVGPositions(match)
-        const predictionTeamHeroes =
-          await this.calculatePredictionByTeamHeroes(match)
-        const predictionTeamHeroesVersus =
-          await this.calculatePredictionByTeamHeroesVersus(match)
+      // const getPredictions = async (match: any) => {
+      //   const predictionHeroesAVG =
+      //     await this.calculatePredictionByHeroesAVG(match)
+      //   const predictionHeroesAVGSides =
+      //     await this.calculatePredictionByHeroesAVGSides(match)
+      //   const predictionHeroesSide =
+      //     await this.calculatePredictionByHeroesRadiantOnly(match)
+      //   const predictionHeroes = await this.calculatePredictionByHeroes(match)
+      //   const predictionHeroesWith =
+      //     await this.calculatePredictionByHeroesWith(match)
+      //   const predictionHeroesWithSides =
+      //     await this.calculatePredictionByHeroesWithSides(match)
+      //   const predictionHeroesPositions =
+      //     await this.calculatePredictionByHeroesAVGPositions(match)
+      //   const predictionTeamHeroes =
+      //     await this.calculatePredictionByTeamHeroes(match)
+      //   const predictionTeamHeroesVersus =
+      //     await this.calculatePredictionByTeamHeroesVersus(match)
+      //   const predictionTeamAVG =
+      //     await this.calculatePredictionByTeamsAVG(match)
+      //   const predictionTeamVsTeam =
+      //     await this.calculatePredictionByTeamVsTeam(match)
+      //   const predictionPlayers = await this.calculatePredictionByPlayers(match)
+      //   const predictionPlayersPosition =
+      //     await this.calculatePredictionByPlayersPosition(match)
 
-        if (predictionHeroes) {
-          return {
-            matchId: match.matchId,
-            start_date_time: match.createdDateTime,
-            radiant_team_id: match.radiantTeamId,
-            dire_team_id: match.direTeamId,
-            predictionHeroesAVG,
-            predictionHeroesAVGSides,
-            predictionHeroes,
-            predictionHeroesSide,
-            predictionHeroesWith,
-            predictionHeroesWithSides,
-            predictionHeroesPositions,
-            predictionTeamHeroes,
-            predictionTeamHeroesVersus,
-          }
-        } else {
-          return null
-        }
-      }
+      //   if (predictionHeroes) {
+      //     return {
+      //       matchId: match.matchId,
+      //       start_date_time: match.createdDateTime,
+      //       radiant_team_id: match.radiantTeamId,
+      //       dire_team_id: match.direTeamId,
+      //       predictionHeroesAVG,
+      //       predictionHeroesAVGSides,
+      //       predictionHeroes,
+      //       predictionHeroesSide,
+      //       predictionHeroesWith,
+      //       predictionHeroesWithSides,
+      //       predictionHeroesPositions,
+      //       predictionTeamHeroes,
+      //       predictionTeamHeroesVersus,
+      //       predictionTeamAVG,
+      //       predictionTeamVsTeam,
+      //       predictionPlayers,
+      //       predictionPlayersPosition,
+      //     }
+      //   } else {
+      //     return null
+      //   }
+      // }
 
-      const predictions = await Promise.all(matches.map(getPredictions))
+      // const predictions = await Promise.all(matches.map(getPredictions))
 
-      // fltered Null predictions
-      const nonNullPredictions = predictions.filter(
-        (prediction) => prediction !== null,
-      )
+      // // fltered Null predictions
+      // const nonNullPredictions = predictions.filter(
+      //   (prediction) => prediction !== null,
+      // )
 
-      await this.savePredictionsToDB(nonNullPredictions)
+      // await this.savePredictionsToDB(nonNullPredictions)
 
-      return nonNullPredictions
+      // return nonNullPredictions
+
       //
-      //return matches[0]
+      return matches[0]
       //return await this.calculatePredictionByHeroesWith(matches[0])
       //return await this.calculatePredictionByHeroesWithSides(matches[1])
       //return await this.getHeroesWithStatisticByMatch(matches[0])
@@ -88,11 +101,11 @@ export class PredictionService {
       //return await this.calculatePredictionByHeroesAVG(matches[0])
       //return await this.getHeroesAVGStatisticByMatch(matches[0])
       //return await this.calculatePredictionByHeroesAVGPositions(matches[0])
-      //return await this.calculatePredictionByTeamHeroes(matches[2])
+      return await this.calculatePredictionByTeamHeroes(matches[0])
       //return await this.getTeamHeroesStatisticByMatch(matches[2])
       //return await this.getTeamHeroesVersusStatisticByMatch(matches[1])
       //return await this.calculatePredictionByTeamHeroesVersus(matches[0])
-      return await this.calculatePredictionByTeamVsTeam(matches[0])
+      return await this.calculatePredictionByPlayersPosition(matches[0])
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
@@ -118,6 +131,10 @@ export class PredictionService {
         prediction_heroes_positions: prediction.predictionHeroesPositions,
         prediction_team_heroes: prediction.predictionTeamHeroes,
         prediction_team_heroes_versus: prediction.predictionTeamHeroesVersus,
+        prediction_team_avg: prediction.predictionTeamAVG,
+        prediction_team_vs_team: prediction.predictionTeamVsTeam,
+        prediction_players_positions: prediction.predictionPlayersPosition,
+        prediction_players: prediction.predictionPlayers,
       }))
       console.log('predictionToCreate - ' + JSON.stringify(predictionToCreate))
       const fieldsToUpdate = [
@@ -133,6 +150,8 @@ export class PredictionService {
         'prediction_heroes_positions',
         'prediction_team_heroes',
         'prediction_team_heroes_versus',
+        'prediction_players_positions',
+        'prediction_players',
       ]
 
       const options = {
@@ -900,11 +919,12 @@ export class PredictionService {
       let radiantTotalCount = 0
       let direTotalSum = 0
       let direTotalCount = 0
-      let advantageTeamHeroes = 0
+      let advantageTeamHeroes = 0.5
 
       //radiant
 
       const radiantStatistic = matchTeamHeroesStatistic[0]
+      console.log('radiantStatistic ' + JSON.stringify(radiantStatistic))
       if (radiantStatistic) {
         if (radiantStatistic[0]) {
           const radiantTotal = radiantStatistic.reduce((total, current) => {
@@ -956,7 +976,24 @@ export class PredictionService {
           direTotalSum += direTotal / direTotalCount
         }
       }
-      advantageTeamHeroes = 0.5 + radiantTotalSum - direTotalSum
+      console.log(
+        'radiantTotalSum - ' +
+          radiantTotalSum +
+          ' radiantTotalCount ' +
+          radiantTotalCount,
+      )
+      console.log(
+        'direTotalSum - ' + direTotalSum + ' direTotalCount ' + direTotalCount,
+      )
+
+      if (radiantTotalSum && direTotalSum) {
+        advantageTeamHeroes = 0.5 + radiantTotalSum - direTotalSum
+      } else if (radiantTotalSum > 0.5) {
+        return radiantTotalSum
+      } else if (direTotalSum > 0.5) {
+        return direTotalSum
+      }
+
       return advantageTeamHeroes
     } catch (error) {
       this.logger.error(
@@ -1019,7 +1056,6 @@ export class PredictionService {
       //radiant
 
       const radiantStatistic = matchTeamHeroesStatistic[0]
-      console.log('radiantStatistic - ' + JSON.stringify(radiantStatistic))
       if (radiantStatistic) {
         if (radiantStatistic[0]) {
           const radiantTotal = radiantStatistic.reduce((total, current) => {
@@ -1055,13 +1091,6 @@ export class PredictionService {
           const direTotal = direStatistic.reduce((total, current) => {
             if (parseInt(current.dirematchescount) > 10) {
               direTotalCount++
-              console.log(
-                'dire - ' +
-                  current.heroid +
-                  ' ' +
-                  parseInt(current.dirematcheswin) /
-                    parseInt(current.dirematchescount),
-              )
               return (
                 total +
                 (parseInt(current.dirematcheswin) /
@@ -1072,12 +1101,6 @@ export class PredictionService {
               )
             } else if (parseInt(current.matchescount) > 10) {
               direTotalCount++
-              console.log(
-                'dire - ' +
-                  current.heroid +
-                  ' ' +
-                  parseInt(current.matcheswin) / parseInt(current.matchescount),
-              )
               return (
                 total +
                 parseInt(current.matcheswin) / parseInt(current.matchescount)
@@ -1089,16 +1112,6 @@ export class PredictionService {
           }
         }
       }
-
-      console.log(
-        'radiantTotalSum ' +
-          radiantTotalSum +
-          ' radiantTotalCount ' +
-          radiantTotalCount,
-      )
-      console.log(
-        'direTotalSum ' + direTotalSum + ' direTotalCount ' + direTotalCount,
-      )
       advantageTeamHeroesVersus = 0.5 + radiantTotalSum - direTotalSum
       return advantageTeamHeroesVersus
     } catch (error) {
@@ -1342,6 +1355,324 @@ export class PredictionService {
       this.logger.error(
         new Date().toLocaleString() +
           ` prediction.service getStatisticByTeamVSTeam Error :`,
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByPlayers(match: any): Promise<any> {
+    try {
+      const matchPlayersStatistic = await this.getPlayersStatisticByMatch(match)
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantagePlayers = 0
+
+      //radiant
+
+      const radiantStatistic = matchPlayersStatistic[0]
+      console.log('radiantStatistic - ' + radiantStatistic)
+      if (radiantStatistic) {
+        if (radiantStatistic[0]) {
+          const radiantTotal = radiantStatistic.reduce((total, current) => {
+            if (parseInt(current.radiant_matchescount) > 10) {
+              radiantTotalCount++
+              console.log(
+                'current rad id ' +
+                  current.steamaccountid +
+                  ' ' +
+                  parseInt(current.matcheswin) +
+                  ' ' +
+                  parseInt(current.matchescount) +
+                  ' = ' +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount),
+              )
+              return (
+                total +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)
+                // (parseInt(current.radiant_matcheswin) /
+                //   parseInt(current.radiant_matchescount) +
+                //   parseInt(current.matcheswin) /
+                //     parseInt(current.matchescount)) /
+                //   2
+              )
+            } else if (parseInt(current.matchescount) > 10) {
+              radiantTotalCount++
+              console.log(
+                'current rad id ' +
+                  current.steamaccountid +
+                  ' ' +
+                  parseInt(current.matcheswin) +
+                  ' ' +
+                  parseInt(current.matchescount) +
+                  ' = ' +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount),
+              )
+              return (
+                total +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)
+              )
+            } else return total
+          }, 0)
+
+          if (radiantTotalCount > 0) {
+            radiantTotalSum += radiantTotal / radiantTotalCount
+          }
+        }
+      }
+
+      //dire
+      const direStatistic = matchPlayersStatistic[1]
+      if (direStatistic) {
+        if (direStatistic[0]) {
+          const direTotal = direStatistic.reduce((total, current) => {
+            if (parseInt(current.dire_matchescount) > 10) {
+              direTotalCount++
+              console.log(
+                'current dir id ' +
+                  current.steamaccountid +
+                  ' ' +
+                  parseInt(current.matcheswin) +
+                  ' ' +
+                  parseInt(current.matchescount) +
+                  ' = ' +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount),
+              )
+              return (
+                total +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)
+                // (parseInt(current.dire_matcheswin) /
+                //   parseInt(current.dire_matchescount) +
+                //   parseInt(current.matcheswin) /
+                //     parseInt(current.matchescount)) /
+                //   2
+              )
+            } else if (parseInt(current.matchescount) > 10) {
+              direTotalCount++
+              console.log(
+                'current dir id ' +
+                  current.steamaccountid +
+                  ' ' +
+                  parseInt(current.matcheswin) +
+                  ' ' +
+                  parseInt(current.matchescount) +
+                  ' = ' +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount),
+              )
+              return (
+                total +
+                parseInt(current.matcheswin) / parseInt(current.matchescount)
+              )
+            } else return total
+          }, 0)
+          if (direTotalCount > 0) {
+            direTotalSum += direTotal / direTotalCount
+          }
+        }
+      }
+      console.log(
+        'radiantTotalSum ' + radiantTotalSum + ' direTotalSum ' + direTotalSum,
+      )
+      console.log(
+        'radiantTotalCount ' +
+          radiantTotalCount +
+          ' direTotalCount ' +
+          direTotalCount,
+      )
+      advantagePlayers = 0.5 + radiantTotalSum - direTotalSum
+      return advantagePlayers
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByPlayers Error:',
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByPlayersPosition(match: any): Promise<any> {
+    try {
+      const matchPlayersStatistic = await this.getPlayersStatisticByMatch(match)
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantagePlayersPosition = 0
+
+      //radiant
+      function getWinrateByPos(playerPosition: string, player: any) {
+        if (playerPosition && player) {
+          if (
+            playerPosition == 'POSITION_1' &&
+            player.position_1_matchescount > 10
+          )
+            return player.position_1_matcheswin / player.position_1_matchescount
+          else if (
+            playerPosition == 'POSITION_2' &&
+            player.position_2_matchescount > 10
+          )
+            return player.position_2_matcheswin / player.position_2_matchescount
+          else if (
+            playerPosition == 'POSITION_3' &&
+            player.position_3_matchescount > 10
+          )
+            return player.position_3_matcheswin / player.position_3_matchescount
+          else if (
+            playerPosition == 'POSITION_4' &&
+            player.position_4_matchescount > 10
+          )
+            return player.position_4_matcheswin / player.position_4_matchescount
+          else if (
+            playerPosition == 'POSITION_5' &&
+            player.position_5_matchescount > 10
+          )
+            return player.position_5_matcheswin / player.position_5_matchescount
+          else return
+        }
+        return
+      }
+
+      const radiantStatistic = matchPlayersStatistic[0]
+      console.log('radiantStatistic - ' + radiantStatistic)
+      if (radiantStatistic) {
+        if (radiantStatistic[0]) {
+          let radiantTotal = 0
+          let currRad = null
+          for (let i = 0; i < radiantStatistic.length; i++) {
+            console.log(
+              'match.players[i].position ' + match.players[i].position,
+            )
+            currRad = getWinrateByPos(
+              match.players[i].position,
+              radiantStatistic[i],
+            )
+            if (currRad) {
+              console.log(
+                'rad id- ' +
+                  match.players[i].steamAccountId +
+                  ': ' +
+                  match.players[i].position,
+              )
+              console.log('rad statist ' + radiantStatistic[i])
+              console.log('rad curr ' + currRad)
+              radiantTotal += currRad
+              radiantTotalCount++
+            }
+          }
+
+          if (radiantTotalCount > 0) {
+            radiantTotalSum += radiantTotal / radiantTotalCount
+          }
+        }
+      }
+
+      //dire
+
+      const direStatistic = matchPlayersStatistic[1]
+      console.log('direStatistic - ' + direStatistic)
+      if (direStatistic) {
+        if (direStatistic[0]) {
+          let direTotal = 0
+          let currDir = null
+          for (let i = 0; i < direStatistic.length; i++) {
+            currDir = getWinrateByPos(
+              match.players[i + 5].position,
+              direStatistic[i],
+            )
+            if (currDir) {
+              console.log(
+                'dir id- ' +
+                  match.players[i + 5].steamAccountId +
+                  ': ' +
+                  match.players[i + 5].position,
+              )
+              console.log('dir statist ' + direStatistic[i])
+              console.log('dir curr ' + currDir)
+              direTotal += currDir
+              direTotalCount++
+            }
+          }
+
+          if (direTotalCount > 0) {
+            direTotalSum += direTotal / direTotalCount
+          }
+        }
+      }
+      console.log(
+        'radiantTotalSum ' + radiantTotalSum + ' direTotalSum ' + direTotalSum,
+      )
+      console.log(
+        'direTotalCount ' +
+          direTotalCount +
+          ' radiantTotalCount ' +
+          radiantTotalCount,
+      )
+      advantagePlayersPosition = 0.5 + radiantTotalSum - direTotalSum
+      return advantagePlayersPosition
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByPlayersPosition Error:',
+        error,
+      )
+    }
+  }
+
+  async getPlayersStatisticByMatch(match: any): Promise<any> {
+    try {
+      const radiantPlayersIds: number[] = match.players
+        .filter((player: any) => player.isRadiant === true)
+        .map((player: any) => player.steamAccountId)
+
+      const direPlayersIds: number[] = match.players
+        .filter((player: any) => player.isRadiant === false)
+        .map((player: any) => player.steamAccountId)
+
+      let statisticByRadiantPlayers: any[] = []
+      for (const radiantPlayerId of radiantPlayersIds) {
+        const promises: Promise<any>[] = []
+        console.log(
+          'getPlayersStatisticByMatch radiantPlayerId ' + radiantPlayerId,
+        )
+        promises.push(this.getStatisticByPlayer(radiantPlayerId))
+        const results = await Promise.all(promises)
+        statisticByRadiantPlayers.push(...results)
+      }
+
+      let statisticByDirePlayers: any[] = []
+      for (const direPlayerId of direPlayersIds) {
+        const promises: Promise<any>[] = []
+        console.log('getPlayersStatisticByMatch direPlayerId ' + direPlayerId)
+        promises.push(this.getStatisticByPlayer(direPlayerId))
+        const results = await Promise.all(promises)
+        statisticByDirePlayers.push(...results)
+      }
+
+      return [statisticByRadiantPlayers, statisticByDirePlayers]
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getPlayersStatisticByMatch Error :`,
+        error,
+      )
+    }
+  }
+
+  async getStatisticByPlayer(playerId: number): Promise<any> {
+    try {
+      const playerStatisticRecord = await Players.findOne({
+        where: {
+          steamaccountid: {
+            [Op.eq]: playerId.toString(),
+          },
+        },
+      })
+      return playerStatisticRecord
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getStatisticByPlayer Error :`,
         error,
       )
     }
