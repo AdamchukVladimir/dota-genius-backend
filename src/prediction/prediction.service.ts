@@ -28,70 +28,73 @@ export class PredictionService {
       const allLiveMatches = await this.fetchAllLiveMatches() // Fetches data as a promise
       const matches = allLiveMatches.data.live.matches
 
-      // const getPredictions = async (match: any) => {
-      //   const predictionHeroesAVG =
-      //     await this.calculatePredictionByHeroesAVG(match)
-      //   const predictionHeroesAVGSides =
-      //     await this.calculatePredictionByHeroesAVGSides(match)
-      //   const predictionHeroesSide =
-      //     await this.calculatePredictionByHeroesRadiantOnly(match)
-      //   const predictionHeroes = await this.calculatePredictionByHeroes(match)
-      //   const predictionHeroesWith =
-      //     await this.calculatePredictionByHeroesWith(match)
-      //   const predictionHeroesWithSides =
-      //     await this.calculatePredictionByHeroesWithSides(match)
-      //   const predictionHeroesPositions =
-      //     await this.calculatePredictionByHeroesAVGPositions(match)
-      //   const predictionTeamHeroes =
-      //     await this.calculatePredictionByTeamHeroes(match)
-      //   const predictionTeamHeroesVersus =
-      //     await this.calculatePredictionByTeamHeroesVersus(match)
-      //   const predictionTeamAVG =
-      //     await this.calculatePredictionByTeamsAVG(match)
-      //   const predictionTeamVsTeam =
-      //     await this.calculatePredictionByTeamVsTeam(match)
-      //   const predictionPlayers = await this.calculatePredictionByPlayers(match)
-      //   const predictionPlayersPosition =
-      //     await this.calculatePredictionByPlayersPosition(match)
+      const getPredictions = async (match: any) => {
+        const predictionHeroesAVG =
+          await this.calculatePredictionByHeroesAVG(match)
+        const predictionHeroesAVGSides =
+          await this.calculatePredictionByHeroesAVGSides(match)
+        const predictionHeroesSide =
+          await this.calculatePredictionByHeroesRadiantOnly(match)
+        const predictionHeroes = await this.calculatePredictionByHeroes(match)
+        const predictionHeroesWith =
+          await this.calculatePredictionByHeroesWith(match)
+        const predictionHeroesWithSides =
+          await this.calculatePredictionByHeroesWithSides(match)
+        const predictionHeroesPositions =
+          await this.calculatePredictionByHeroesAVGPositions(match)
+        const predictionTeamHeroes =
+          await this.calculatePredictionByTeamHeroes(match)
+        const predictionTeamHeroesVersus =
+          await this.calculatePredictionByTeamHeroesVersus(match)
+        const predictionTeamAVG =
+          await this.calculatePredictionByTeamsAVG(match)
+        const predictionTeamVsTeam =
+          await this.calculatePredictionByTeamVsTeam(match)
+        const predictionPlayers = await this.calculatePredictionByPlayers(match)
+        const predictionPlayersPosition =
+          await this.calculatePredictionByPlayersPosition(match)
+        const predictionHeroesFirstblood =
+          await this.calculateAccumulatePredictionByHeroesFirstblood(match)
 
-      //   if (predictionHeroes) {
-      //     return {
-      //       matchId: match.matchId,
-      //       start_date_time: match.createdDateTime,
-      //       radiant_team_id: match.radiantTeamId,
-      //       dire_team_id: match.direTeamId,
-      //       predictionHeroesAVG,
-      //       predictionHeroesAVGSides,
-      //       predictionHeroes,
-      //       predictionHeroesSide,
-      //       predictionHeroesWith,
-      //       predictionHeroesWithSides,
-      //       predictionHeroesPositions,
-      //       predictionTeamHeroes,
-      //       predictionTeamHeroesVersus,
-      //       predictionTeamAVG,
-      //       predictionTeamVsTeam,
-      //       predictionPlayers,
-      //       predictionPlayersPosition,
-      //     }
-      //   } else {
-      //     return null
-      //   }
-      // }
+        if (predictionHeroes) {
+          return {
+            matchId: match.matchId,
+            start_date_time: match.createdDateTime,
+            radiant_team_id: match.radiantTeamId,
+            dire_team_id: match.direTeamId,
+            predictionHeroesAVG,
+            predictionHeroesAVGSides,
+            predictionHeroes,
+            predictionHeroesSide,
+            predictionHeroesWith,
+            predictionHeroesWithSides,
+            predictionHeroesPositions,
+            predictionTeamHeroes,
+            predictionTeamHeroesVersus,
+            predictionTeamAVG,
+            predictionTeamVsTeam,
+            predictionPlayers,
+            predictionPlayersPosition,
+            predictionHeroesFirstblood,
+          }
+        } else {
+          return null
+        }
+      }
 
-      // const predictions = await Promise.all(matches.map(getPredictions))
+      const predictions = await Promise.all(matches.map(getPredictions))
 
-      // // fltered Null predictions
-      // const nonNullPredictions = predictions.filter(
-      //   (prediction) => prediction !== null,
-      // )
+      // fltered Null predictions
+      const nonNullPredictions = predictions.filter(
+        (prediction) => prediction !== null,
+      )
 
-      // await this.savePredictionsToDB(nonNullPredictions)
+      await this.savePredictionsToDB(nonNullPredictions)
 
-      // return nonNullPredictions
+      return nonNullPredictions
 
       //
-      return matches[0]
+      //return matches[0]
       //return await this.calculatePredictionByHeroesWith(matches[0])
       //return await this.calculatePredictionByHeroesWithSides(matches[1])
       //return await this.getHeroesWithStatisticByMatch(matches[0])
@@ -101,10 +104,16 @@ export class PredictionService {
       //return await this.calculatePredictionByHeroesAVG(matches[0])
       //return await this.getHeroesAVGStatisticByMatch(matches[0])
       //return await this.calculatePredictionByHeroesAVGPositions(matches[0])
-      return await this.calculatePredictionByTeamHeroes(matches[0])
+      //return await this.calculatePredictionByTeamHeroes(matches[0])
       //return await this.getTeamHeroesStatisticByMatch(matches[2])
       //return await this.getTeamHeroesVersusStatisticByMatch(matches[1])
       //return await this.calculatePredictionByTeamHeroesVersus(matches[0])
+      return await this.calculateAccumulatePredictionByHeroesFirstblood(
+        matches[0],
+      )
+      return await this.calculatePredictionByHeroesWithFirstblood(matches[0])
+      return await this.calculatePredictionByHeroesFirstblood(matches[0])
+      return await this.calculatePredictionByTeamsAVG(matches[0])
       return await this.calculatePredictionByPlayersPosition(matches[0])
     } catch (error) {
       this.logger.error(
@@ -131,10 +140,11 @@ export class PredictionService {
         prediction_heroes_positions: prediction.predictionHeroesPositions,
         prediction_team_heroes: prediction.predictionTeamHeroes,
         prediction_team_heroes_versus: prediction.predictionTeamHeroesVersus,
-        prediction_team_avg: prediction.predictionTeamAVG,
+        prediction_teams_avg: prediction.predictionTeamAVG,
         prediction_team_vs_team: prediction.predictionTeamVsTeam,
         prediction_players_positions: prediction.predictionPlayersPosition,
         prediction_players: prediction.predictionPlayers,
+        prediction_firstblood_heroes: prediction.predictionHeroesFirstblood,
       }))
       console.log('predictionToCreate - ' + JSON.stringify(predictionToCreate))
       const fieldsToUpdate = [
@@ -150,8 +160,11 @@ export class PredictionService {
         'prediction_heroes_positions',
         'prediction_team_heroes',
         'prediction_team_heroes_versus',
+        'prediction_teams_avg',
+        'prediction_team_vs_team',
         'prediction_players_positions',
         'prediction_players',
+        'prediction_firstblood_heroes',
       ]
 
       const options = {
@@ -265,6 +278,45 @@ export class PredictionService {
       this.logger.error(
         new Date().toLocaleString() +
           'prediction.service calculatePredictionByHeroes Error:',
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByHeroesFirstblood(match: any): Promise<any> {
+    try {
+      const matchHeroesStatistic = await this.getHeroesStatisticByMatch(match)
+
+      let totalSum = 0
+      let totalCount = 0
+
+      for (const heroId in matchHeroesStatistic) {
+        const heroes = matchHeroesStatistic[heroId]
+
+        if (heroes) {
+          let heroesCount = 0
+          const heroTotal = heroes.reduce((total, current) => {
+            if (
+              current &&
+              current.matchescount !== null &&
+              current.firstbloodtime_avg !== null
+            ) {
+              heroesCount++
+              return total + parseInt(current.firstbloodtime_avg)
+            } else {
+              return total
+            }
+          }, 0)
+          totalSum += heroTotal / heroesCount
+          totalCount++
+        }
+      }
+      const average = totalSum / totalCount
+      return average
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service calculatePredictionByHeroes Error :`,
         error,
       )
     }
@@ -535,6 +587,84 @@ export class PredictionService {
     }
   }
 
+  async calculateAccumulatePredictionByHeroesFirstblood(
+    match: any,
+  ): Promise<any> {
+    const heroesAVGFirstblood =
+      await this.calculatePredictionByHeroesAVGFirstblood(match)
+    const heroesWithFirstblood =
+      await this.calculatePredictionByHeroesWithFirstblood(match)
+    const heroesFistblood =
+      await this.calculatePredictionByHeroesFirstblood(match)
+    let heroesFirstbloodCount = 0
+    let heroesFirstbloodTotal = 0
+    if (heroesAVGFirstblood) {
+      console.log('heroesAVGFirstblood ' + heroesAVGFirstblood)
+      heroesFirstbloodTotal += heroesAVGFirstblood
+      heroesFirstbloodCount++
+    }
+    if (heroesWithFirstblood) {
+      console.log('heroesWithFirstblood ' + heroesWithFirstblood)
+      heroesFirstbloodTotal += heroesWithFirstblood
+      heroesFirstbloodCount++
+    }
+    if (heroesFistblood) {
+      console.log('heroesFistblood ' + heroesFistblood)
+      heroesFirstbloodTotal += heroesFistblood
+      heroesFirstbloodCount++
+    }
+    if (heroesFirstbloodCount > 0 && heroesFirstbloodTotal > 0)
+      return heroesFirstbloodTotal / heroesFirstbloodCount
+
+    return
+  }
+
+  async calculatePredictionByHeroesAVGFirstblood(match: any): Promise<any> {
+    try {
+      const matchHeroesAVGStatistic =
+        await this.getHeroesAVGStatisticByMatch(match)
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantageHeroesAVG = 0
+
+      //radiant
+
+      const radiantStatistic = matchHeroesAVGStatistic[0]
+      if (radiantStatistic) {
+        const radiantTotal = radiantStatistic.reduce((total, current) => {
+          if (parseInt(current.firstbloodtime_avg)) {
+            radiantTotalCount++
+            return total + parseInt(current.firstbloodtime_avg)
+          } else return total
+        }, 0)
+        radiantTotalSum += radiantTotal / radiantTotalCount
+      }
+
+      //dire
+      const direStatistic = matchHeroesAVGStatistic[1]
+      if (direStatistic) {
+        const direTotal = direStatistic.reduce((total, current) => {
+          if (parseInt(current.firstbloodtime_avg)) {
+            direTotalCount++
+            return total + parseInt(current.firstbloodtime_avg)
+          } else return total
+        }, 0)
+        direTotalSum += direTotal / direTotalCount
+      }
+
+      advantageHeroesAVG = (radiantTotalSum + direTotalSum) / 2
+      return advantageHeroesAVG
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByHeroesAVGSides Error:',
+        error,
+      )
+    }
+  }
+
   async calculatePredictionByHeroesAVG(match: any): Promise<any> {
     try {
       const matchHeroesAVGStatistic =
@@ -621,6 +751,7 @@ export class PredictionService {
       )
     }
   }
+
   async getHeroesAVGStatisticByMatch(match: any): Promise<any> {
     try {
       const radiantHeroesIds: number[] = match.players
@@ -737,6 +868,53 @@ export class PredictionService {
       }
 
       advantageHeroesWith = 0.5 + radiantTotalSum - direTotalSum
+      return advantageHeroesWith
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          'prediction.service calculatePredictionByHeroesWith Error:',
+        error,
+      )
+    }
+  }
+
+  async calculatePredictionByHeroesWithFirstblood(match: any): Promise<any> {
+    try {
+      const matchHeroesWithStatistic =
+        await this.getHeroesWithStatisticByMatch(match)
+
+      let radiantTotalSum = 0
+      let radiantTotalCount = 0
+      let direTotalSum = 0
+      let direTotalCount = 0
+      let advantageHeroesWith = 0
+
+      //radiant
+
+      const radiantStatistic = matchHeroesWithStatistic[0]
+      if (radiantStatistic) {
+        const radiantTotal = radiantStatistic.reduce((total, current) => {
+          if (parseInt(current.firstbloodtime_avg)) {
+            radiantTotalCount++
+            return total + parseInt(current.firstbloodtime_avg)
+          } else return total
+        }, 0)
+        radiantTotalSum += radiantTotal / radiantTotalCount
+      }
+
+      //dire
+      const direStatistic = matchHeroesWithStatistic[1]
+      if (direStatistic) {
+        const direTotal = direStatistic.reduce((total, current) => {
+          if (parseInt(current.firstbloodtime_avg)) {
+            direTotalCount++
+            return total + parseInt(current.firstbloodtime_avg)
+          } else return total
+        }, 0)
+        direTotalSum += direTotal / direTotalCount
+      }
+
+      advantageHeroesWith = (radiantTotalSum + direTotalSum) / 2
       return advantageHeroesWith
     } catch (error) {
       this.logger.error(

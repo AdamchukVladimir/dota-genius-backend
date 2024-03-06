@@ -49,6 +49,12 @@ export class Players extends Model {
     type: DataType.BIGINT,
     allowNull: true,
   })
+  firstbloodtime_avg: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
   position_1_matchescount: number
 
   @Column({

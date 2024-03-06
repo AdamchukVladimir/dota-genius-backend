@@ -59,3 +59,13 @@ WHERE
     NOT EXISTS (SELECT 1 FROM players WHERE players.steamAccountId = mp.steamAccountId)
 GROUP BY 
     mp.steamAccountId;
+
+
+UPDATE players
+SET firstbloodtime_avg = (
+  SELECT AVG(matchesplayers.firstbloodtime)
+  FROM matchesplayers
+  WHERE (
+    players.steamaccountid = matchesplayers.steamaccountid
+  )
+);

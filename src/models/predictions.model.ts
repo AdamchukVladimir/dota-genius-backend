@@ -45,6 +45,30 @@ export class Predictions extends Model {
   dire_team_id: number
 
   @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  firstblood_time: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  prediction_firstblood_heroes: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  prediction_firstblood_teams: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
+  prediction_firstblood_players: number
+
+  @Column({
     type: DataType.REAL,
     allowNull: true,
   })
@@ -97,6 +121,12 @@ export class Predictions extends Model {
     allowNull: true,
   })
   prediction_team_heroes_versus: number
+
+  @Column({
+    type: DataType.REAL,
+    allowNull: true,
+  })
+  prediction_teams_avg: number
 
   @Column({
     type: DataType.REAL,

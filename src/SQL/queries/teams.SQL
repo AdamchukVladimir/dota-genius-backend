@@ -25,7 +25,8 @@ SET matchesCount = 0,
     radiantMatchesCount = 0,
     direMatchesCount = 0,
     radiantMatchesWin = 0,
-    direMatchesWin = 0;
+    direMatchesWin = 0,
+    firstbloodtime_avg = 0;
 
 DO $$  
 DECLARE 
@@ -51,3 +52,14 @@ BEGIN
         WHERE teams.teamid = match_record.direTeamId AND match_record.didRadiantWin = false;
     END LOOP;
 END $$;
+
+UPDATE teams
+SET firstbloodtime_avg = (
+  SELECT AVG(matches.firstbloodtime)
+  FROM matches
+  WHERE (
+    teams.teamid = matches.radiantteamid
+  OR 
+    teams.teamid = matches.direteamid
+  )
+);

@@ -73,4 +73,14 @@ SET
 	AND matches.didradiantwin = 'true')
 	OR
 	(heroes_avg.hero_id IN (matches.direhero5)
-	AND matches.didradiantwin = 'false'));
+	AND matches.didradiantwin = 'false')),
+
+	firstbloodtime_avg = (
+  SELECT AVG(matches.firstbloodtime)
+  FROM matches
+  WHERE (
+    heroes_avg.hero_id IN (matches.radianthero1, matches.radianthero2, matches.radianthero3, matches.radianthero4, matches.radianthero5)
+  OR 
+    heroes_avg.hero_id IN (matches.direhero1, matches.direhero2, matches.direhero3, matches.direhero4, matches.direhero5)
+  )
+);

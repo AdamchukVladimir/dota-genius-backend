@@ -24,6 +24,12 @@ export class HeroesAVG extends Model {
     type: DataType.BIGINT,
     allowNull: true,
   })
+  firstbloodtime_avg: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
   matches_count: number
 
   @Column({

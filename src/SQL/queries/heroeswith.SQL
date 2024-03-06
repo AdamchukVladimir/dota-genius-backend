@@ -38,4 +38,16 @@ SET matchescount = (SELECT COUNT(*)
                       WHERE (heroes_with.hero1 IN (direhero1, direhero2, direhero3, direhero4, direhero5) 
                       AND heroes_with.hero2 IN (direhero1, direhero2, direhero3, direhero4, direhero5)) 
                       AND matches.didradiantwin = 'false'
-                     );
+                     ),
+    firstbloodtime_avg = (
+  SELECT AVG(matches.firstbloodtime)
+  FROM matches
+  WHERE (
+    heroes_with.hero1 IN (matches.radianthero1, matches.radianthero2, matches.radianthero3, matches.radianthero4, matches.radianthero5)
+    AND heroes_with.hero2 IN (matches.radianthero1, matches.radianthero2, matches.radianthero3, matches.radianthero4, matches.radianthero5)
+  )
+  OR (
+    heroes_with.hero1 IN (matches.direhero1, matches.direhero2, matches.direhero3, matches.direhero4, matches.direhero5)
+    AND heroes_with.hero2 IN (matches.direhero1, matches.direhero2, matches.direhero3, matches.direhero4, matches.direhero5)
+  )
+);
