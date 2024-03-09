@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common'
-import { PredictionService } from './prediction.service'
-import { PredictionController } from './prediction.controller'
+import { TelegramService } from './telegram.service'
+import { TelegramController } from './telegram.controller'
+import { PredictionService } from 'src/prediction/prediction.service'
 import { GraphQLService } from 'src/api/graphql/graphql.service'
 import { MatchesService } from 'src/matches/matches.service'
 import { LeaguesService } from 'src/leagues/leagues.service'
 import { QueueService } from 'src/queues/queue.service'
-import { BullModule } from '@nestjs/bull'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { BullModule } from '@nestjs/bull'
 
 @Module({
   imports: [
@@ -26,12 +27,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
     }),
   ],
   providers: [
+    TelegramService,
     PredictionService,
     GraphQLService,
     MatchesService,
     LeaguesService,
     QueueService,
   ],
-  controllers: [PredictionController],
+  controllers: [TelegramController],
 })
-export class PredictionModule {}
+export class TelegramModule {}

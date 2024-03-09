@@ -20,4 +20,8 @@ export class PredictionController {
   async testProcessPredictions(): Promise<any> {
     return await this.predictionService.testProcessPredictions()
   }
+  @Get('reload')
+  async reloadPredictionsByFinishedMatches(): Promise<any> {
+    return await this.predictionService.reloadPredictionsByFinishedMatches()
+  }
 }

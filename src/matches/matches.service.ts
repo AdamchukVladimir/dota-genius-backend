@@ -21,8 +21,7 @@ export class MatchesService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  //@Cron(CronExpression.EVERY_5_MINUTES)
-  @Cron(CronExpression.EVERY_DAY_AT_1AM) //Temporary off Cron
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async processMatchesByLeagues(): Promise<void> {
     try {
       const leagues = await this.leaguesService.getRecentLeaguesFromDB()
@@ -38,7 +37,7 @@ export class MatchesService {
       )
     }
   }
-  //@Cron(CronExpression.EVERY_DAY_AT_4AM)
+  @Cron(CronExpression.EVERY_DAY_AT_4AM)
   async processReloadMatchesDetails(): Promise<void> {
     try {
       const matchesEmpty = await this.getMatchesFromDB()
@@ -148,6 +147,22 @@ export class MatchesService {
     }
   }
 
+  async getMatchFromDB(matchId: number): Promise<any> {
+    try {
+      const matchFinished = await Match.findOne({
+        where: {
+          match_id: matchId,
+        },
+      })
+      return matchFinished
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() + ' matches.service ERROR getMatcFromDB:',
+        error,
+      )
+    }
+  }
+
   async fetchMatchDetails(matchId: number): Promise<any> {
     console.log('Fetching matches id: ' + matchId)
     try {
@@ -173,6 +188,7 @@ export class MatchesService {
 
   async saveMatchPlayerToDB(matchFull: any): Promise<void> {
     console.log('match id ' + matchFull.id)
+    console.log('match full ' + JSON.stringify(matchFull))
     try {
       const dataToCreate = matchFull.players.map((player) => ({
         match_id: matchFull.id,
@@ -193,7 +209,8 @@ export class MatchesService {
         firstbloodtime: matchFull.firstBloodTime,
         //nickname: player.steamAccount.name,
         nickname:
-          player.steamAccount?.proSteamAccount.name || player.steamAccount.name,
+          player.steamAccount?.proSteamAccount?.name ||
+          player?.steamAccount.name,
       }))
 
       await MatchesPlayers.bulkCreate(dataToCreate)

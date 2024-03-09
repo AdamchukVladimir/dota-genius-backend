@@ -54,6 +54,12 @@ export class Predictions extends Model {
     type: DataType.BIGINT,
     allowNull: true,
   })
+  prediction_firstblood_result: number
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: true,
+  })
   prediction_firstblood_heroes: number
 
   @Column({

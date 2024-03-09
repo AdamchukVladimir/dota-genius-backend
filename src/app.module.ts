@@ -25,6 +25,7 @@ import { TeamHeroesVersus } from './models/teamheroesversus.model'
 import { TeamsVsTeams } from './models/temsvsteams.model'
 import { Team } from './models/teams.model'
 import { Players } from './models/players.model'
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   controllers: [AppController],
@@ -71,8 +72,8 @@ import { Players } from './models/players.model'
     ScheduleModule.forRoot(), // Cron scheduler
     MatchesModule,
     QueueModule, // Redis
-    SqlReloaderModule,
-    PredictionModule, // Reloader clear SQL queries
+    SqlReloaderModule, // Reloader clear SQL queries
+    PredictionModule, TelegramModule,
   ],
 })
 export class AppModule {}

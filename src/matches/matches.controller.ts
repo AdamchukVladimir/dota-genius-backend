@@ -19,4 +19,9 @@ export class MatchesController {
   async processReloadMatchesDetails(): Promise<any> {
     await this.matchesService.processReloadMatchesDetails()
   }
+
+  @Post('process')
+  async processMatchesByLeagues(): Promise<any> {
+    await this.matchesService.processMatchesByLeagues()
+  }
 }
