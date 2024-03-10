@@ -26,7 +26,10 @@ export class TelegramService {
     //this.bot.start((ctx) => ctx.reply('Привет! Это мой телеграм-бот.'))
     this.bot.start((ctx) => this.showMainMenu(ctx))
     this.bot.hears('Недавние игры', async (ctx) => this.showRecentGames(ctx))
-    this.bot.action(/^game_(\d+)/, async (ctx) => this.showGameDetails(ctx))
+    this.bot.hears('Текущие игры', async (ctx) => this.showCurrentGames(ctx))
+    this.bot.action(/^finished_game_(\d+)/, async (ctx) =>
+      this.showFinishedGameDetails(ctx),
+    )
   }
 
   async sendMessage(chatId: number, text: string) {
@@ -44,21 +47,65 @@ export class TelegramService {
     )
   }
 
+  async showCurrentGames(ctx) {
+    try {
+      const predictions =
+        await this.predictionService.getCurrentPredictionFromDB() // Получаем последние 5 записей из таблицы Predictions
+      console.log('current ' + JSON.stringify(predictions))
+      let message = 'Текущие игры:\n'
+      let matchesDetails = []
+
+      const inlineKeyboard = Markup.inlineKeyboard(
+        predictions.map((prediction, index) => {
+          let buttonText = ''
+
+          buttonText = ` ${prediction?.radiant_team_name || prediction?.radiant_team_id} vs ${prediction?.dire_team_name || prediction?.dire_team_id}`
+
+          return [
+            Markup.button.callback(
+              buttonText,
+              `current_game_${prediction.match_id}`,
+            ),
+          ]
+        }),
+      )
+      await ctx.reply(message, inlineKeyboard)
+    } catch (error) {
+      console.error('Ошибка при получении текущих игр:', error)
+      await ctx.reply('Произошла ошибка при получении текущих игр.')
+    }
+  }
+
   async showRecentGames(ctx) {
     try {
-      const predictions = await Predictions.findAll({ limit: 5 }) // Получаем последние 5 записей из таблицы Predictions
+      const predictions =
+        await this.predictionService.getFinishedPredictionFromDB()
       let message = 'Недавние игры:\n'
-      predictions.forEach((prediction, index) => {
-        message += `${index + 1}. Команды: ${prediction.radiant_team_id} vs ${prediction.dire_team_id}\n`
-        message += `Match ID: ${prediction.match_id}\n\n`
-      })
+      let matchesDetails = []
+      for (const prediction of predictions) {
+        const matchDetails = await this.matchesService.getMatchFromDB(
+          prediction.match_id,
+        )
+        matchesDetails.push(matchDetails)
+        //message += `Match ID: ${prediction.match_id}\n\n`
+      }
       const inlineKeyboard = Markup.inlineKeyboard(
-        predictions.map((prediction, index) => [
-          Markup.button.callback(
-            `Игра ${index + 1}`,
-            `game_${prediction.match_id}`,
-          ),
-        ]),
+        predictions.map((prediction, index) => {
+          let buttonText = ''
+
+          if (prediction.did_radiant_win) {
+            buttonText = `🟢 ${matchesDetails[index].radiantteamname} vs ${matchesDetails[index].direteamname}`
+          } else {
+            buttonText = `${matchesDetails[index].radiantteamname} vs ${matchesDetails[index].direteamname} 🔴`
+          }
+
+          return [
+            Markup.button.callback(
+              buttonText,
+              `finished_game_${prediction.match_id}`,
+            ),
+          ]
+        }),
       )
       await ctx.reply(message, inlineKeyboard)
     } catch (error) {
@@ -67,19 +114,30 @@ export class TelegramService {
     }
   }
 
-  async showGameDetails(ctx) {
+  async showFinishedGameDetails(ctx) {
     const matchId = parseInt(ctx.match[1], 10)
     try {
       const prediction =
         await this.predictionService.getPredictionFromDB(matchId)
       const match = await this.matchesService.getMatchFromDB(matchId)
       if (prediction && match) {
+        const firstBloodTimeFormatted = this.getTimeByUnix(
+          prediction.firstblood_time,
+        )
+        const predictionFirstBloodFormatted = this.getTimeByUnix(
+          prediction.prediction_firstblood_result,
+        )
         if (match.did_radiant_win !== null) {
           let message = `Подробности игры:\n`
-          message += `Команды: ${match.radiantteamname} vs ${match.direteamname}\n`
           message += `Match ID: ${prediction.match_id}\n`
+          if (prediction.did_radiant_win) {
+            message += `Команды: ✔️${match.radiantteamname} vs ${match.direteamname}\n`
+          } else {
+            message += `Команды: ${match.radiantteamname} vs ${match.direteamname}✔️\n`
+          }
+          message += `Первая кровь: ${firstBloodTimeFormatted}\n`
           message += `Результат прогноза: ${prediction.prediction_result}\n`
-          message += `Первая кровь: ${prediction.prediction_firstblood_result}\n`
+          message += `Прогноз Первая кровь: ${predictionFirstBloodFormatted}\n`
           await ctx.reply(message)
         }
       } else {
@@ -91,22 +149,16 @@ export class TelegramService {
     }
   }
 
-  //   async showRecentGames(ctx) {
-  //     try {
-  //       const predictions = await Predictions.findAll({ limit: 5 }) // Получаем последние 5 записей из таблицы Predictions
-  //       let message = 'Недавние игры:\n'
-  //       predictions.forEach((prediction) => {
-  //         message += `Команды: ${prediction.radiant_team_id} vs ${prediction.dire_team_id}\n`
-  //         message += `Match ID: ${prediction.match_id}\n`
-  //         message += `Результат прогноза: ${prediction.prediction_result}\n`
-  //         message += `Первая кровь: ${prediction.prediction_firstblood_result}\n\n`
-  //       })
-  //       await ctx.reply(message)
-  //     } catch (error) {
-  //       console.error('Ошибка при получении недавних игр:', error)
-  //       await ctx.reply('Произошла ошибка при получении недавних игр.')
-  //     }
-  //   }
+  getTimeByUnix(time: number): string {
+    const TimeMsec = new Date(time * 1000)
+    const timeFormatted = [
+      String(TimeMsec.getUTCHours()).padStart(2, '0'),
+      String(TimeMsec.getUTCMinutes()).padStart(2, '0'),
+      String(TimeMsec.getUTCSeconds()).padStart(2, '0'),
+    ].join(':')
+
+    return timeFormatted
+  }
 
   startBot() {
     this.bot.launch()

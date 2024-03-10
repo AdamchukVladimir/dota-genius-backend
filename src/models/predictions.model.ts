@@ -45,6 +45,18 @@ export class Predictions extends Model {
   dire_team_id: number
 
   @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  radiant_team_name: string
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  dire_team_name: string
+
+  @Column({
     type: DataType.BIGINT,
     allowNull: true,
   })

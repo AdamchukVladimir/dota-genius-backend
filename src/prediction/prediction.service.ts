@@ -72,6 +72,8 @@ export class PredictionService {
             start_date_time: match.createdDateTime,
             radiant_team_id: match.radiantTeamId,
             dire_team_id: match.direTeamId,
+            radiant_team_name: match?.radiantTeam?.name,
+            dire_team_name: match?.direTeam?.name,
             predictionHeroesAVG,
             predictionHeroesAVGSides,
             predictionHeroes,
@@ -224,6 +226,8 @@ export class PredictionService {
         start_date_time: prediction.start_date_time,
         radiant_team_id: prediction.radiant_team_id,
         dire_team_id: prediction.dire_team_id,
+        radiant_team_name: prediction.radiant_team_name,
+        dire_team_name: prediction.dire_team_name,
         prediction_heroes_avg: prediction.predictionHeroesAVG,
         prediction_heroes_avg_sides: prediction.predictionHeroesAVGSides,
         prediction_heroes: prediction.predictionHeroes,
@@ -248,6 +252,8 @@ export class PredictionService {
         'start_date_time',
         'radiant_team_id',
         'dire_team_id',
+        'radiant_team_name',
+        'dire_team_name',
         'prediction_heroes_avg',
         'prediction_heroes_avg_sides',
         'prediction_heroes',
@@ -2218,25 +2224,58 @@ export class PredictionService {
     try {
       const prediction = await Predictions.findOne({
         where: {
-          [Op.and]: [
-            {
-              match_id: {
-                [Op.eq]: matchId,
-              },
-            },
-            {
-              did_radiant_win: {
-                [Op.not]: null,
-              },
-            },
-          ],
+          match_id: {
+            [Op.eq]: matchId,
+          },
         },
       })
       return prediction
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
-          ` prediction.service getPredictionFromDB Error :`,
+          ` prediction.service getFinishedPredictionFromDB Error :`,
+        error,
+      )
+    }
+  }
+
+  async getCurrentPredictionFromDB(): Promise<any> {
+    try {
+      const predictions = await Predictions.findAll({
+        where: {
+          did_radiant_win: {
+            [Op.eq]: null,
+          },
+        },
+        limit: 5,
+        order: [['start_date_time', 'ASC']],
+      })
+      return predictions
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getCurrentPredictionFromDB Error :`,
+        error,
+      )
+    }
+  }
+
+  async getFinishedPredictionFromDB(): Promise<any> {
+    try {
+      const predictions = await Predictions.findAll({
+        where: {
+          did_radiant_win: {
+            [Op.not]: null,
+          },
+        },
+        limit: 5,
+        order: [['start_date_time', 'ASC']],
+      })
+      return predictions
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service getFinishedPredictionFromDB Error :`,
         error,
       )
     }
