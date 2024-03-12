@@ -8,6 +8,7 @@ import { LeaguesService } from 'src/leagues/leagues.service'
 import { QueueService } from 'src/queues/queue.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { BullModule } from '@nestjs/bull'
+import { UsersTgService } from 'src/users_tg/users_tg.service'
 
 @Module({
   imports: [

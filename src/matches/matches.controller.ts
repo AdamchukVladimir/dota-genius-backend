@@ -15,6 +15,12 @@ export class MatchesController {
     const matchDetails = await this.matchesService.fetchMatchDetails(7590464570)
     return matchDetails
   }
+  @Get('live')
+  async fetchAllLiveMatches(): Promise<any> {
+    const liveMatches = await this.matchesService.fetchAllLiveMatches()
+    return liveMatches
+  }
+
   @Post()
   async processReloadMatchesDetails(): Promise<any> {
     await this.matchesService.processReloadMatchesDetails()

@@ -30,7 +30,7 @@ export class PredictionService {
   @Cron(CronExpression.EVERY_10_MINUTES)
   async processPredictions(): Promise<any> {
     try {
-      const allLiveMatches = await this.fetchAllLiveMatches() // Fetches data as a promise
+      const allLiveMatches = await this.matchesService.fetchAllLiveMatches() // Fetches data as a promise
       const matches = allLiveMatches.data.live.matches
 
       const getPredictions = async (match: any) => {
@@ -400,21 +400,21 @@ export class PredictionService {
     }
   }
 
-  async fetchAllLiveMatches(): Promise<any> {
-    try {
-      let liveMatches
-      liveMatches = await this.graphQLService.apolloClient.query({
-        query: FETCH_LIVE_QUERY,
-      })
-      return liveMatches
-    } catch (error) {
-      this.logger.error(
-        new Date().toLocaleString() +
-          ` prediction.service fetchAllLiveMatches Error :`,
-        error,
-      )
-    }
-  }
+  // async fetchAllLiveMatches(): Promise<any> {
+  //   try {
+  //     let liveMatches
+  //     liveMatches = await this.graphQLService.apolloClient.query({
+  //       query: FETCH_LIVE_QUERY,
+  //     })
+  //     return liveMatches
+  //   } catch (error) {
+  //     this.logger.error(
+  //       new Date().toLocaleString() +
+  //         ` prediction.service fetchAllLiveMatches Error :`,
+  //       error,
+  //     )
+  //   }
+  // }
 
   async calculatePredictionByHeroes(match: any): Promise<any> {
     try {
@@ -837,25 +837,29 @@ export class PredictionService {
 
       const radiantStatistic = matchHeroesAVGStatistic[0]
       if (radiantStatistic) {
-        const radiantTotal = radiantStatistic.reduce((total, current) => {
-          if (parseInt(current.firstbloodtime_avg)) {
-            radiantTotalCount++
-            return total + parseInt(current.firstbloodtime_avg)
-          } else return total
-        }, 0)
-        radiantTotalSum += radiantTotal / radiantTotalCount
+        if (radiantStatistic[0]) {
+          const radiantTotal = radiantStatistic.reduce((total, current) => {
+            if (parseInt(current.firstbloodtime_avg)) {
+              radiantTotalCount++
+              return total + parseInt(current.firstbloodtime_avg)
+            } else return total
+          }, 0)
+          radiantTotalSum += radiantTotal / radiantTotalCount
+        }
       }
 
       //dire
       const direStatistic = matchHeroesAVGStatistic[1]
       if (direStatistic) {
-        const direTotal = direStatistic.reduce((total, current) => {
-          if (parseInt(current.firstbloodtime_avg)) {
-            direTotalCount++
-            return total + parseInt(current.firstbloodtime_avg)
-          } else return total
-        }, 0)
-        direTotalSum += direTotal / direTotalCount
+        if (direStatistic[0]) {
+          const direTotal = direStatistic.reduce((total, current) => {
+            if (parseInt(current.firstbloodtime_avg)) {
+              direTotalCount++
+              return total + parseInt(current.firstbloodtime_avg)
+            } else return total
+          }, 0)
+          direTotalSum += direTotal / direTotalCount
+        }
       }
 
       advantageHeroesAVG = (radiantTotalSum + direTotalSum) / 2
@@ -1097,25 +1101,29 @@ export class PredictionService {
 
       const radiantStatistic = matchHeroesWithStatistic[0]
       if (radiantStatistic) {
-        const radiantTotal = radiantStatistic.reduce((total, current) => {
-          if (parseInt(current.firstbloodtime_avg)) {
-            radiantTotalCount++
-            return total + parseInt(current.firstbloodtime_avg)
-          } else return total
-        }, 0)
-        radiantTotalSum += radiantTotal / radiantTotalCount
+        if (radiantStatistic[0]) {
+          const radiantTotal = radiantStatistic.reduce((total, current) => {
+            if (parseInt(current.firstbloodtime_avg)) {
+              radiantTotalCount++
+              return total + parseInt(current.firstbloodtime_avg)
+            } else return total
+          }, 0)
+          radiantTotalSum += radiantTotal / radiantTotalCount
+        }
       }
 
       //dire
       const direStatistic = matchHeroesWithStatistic[1]
       if (direStatistic) {
-        const direTotal = direStatistic.reduce((total, current) => {
-          if (parseInt(current.firstbloodtime_avg)) {
-            direTotalCount++
-            return total + parseInt(current.firstbloodtime_avg)
-          } else return total
-        }, 0)
-        direTotalSum += direTotal / direTotalCount
+        if (direStatistic[0]) {
+          const direTotal = direStatistic.reduce((total, current) => {
+            if (parseInt(current.firstbloodtime_avg)) {
+              direTotalCount++
+              return total + parseInt(current.firstbloodtime_avg)
+            } else return total
+          }, 0)
+          direTotalSum += direTotal / direTotalCount
+        }
       }
 
       advantageHeroesWith = (radiantTotalSum + direTotalSum) / 2
@@ -1903,43 +1911,47 @@ export class PredictionService {
       if (radiantStatistic) {
         if (radiantStatistic[0]) {
           const radiantTotal = radiantStatistic.reduce((total, current) => {
-            if (parseInt(current.radiant_matchescount) > 10) {
-              radiantTotalCount++
-              console.log(
-                'current rad id ' +
-                  current.steamaccountid +
-                  ' ' +
-                  parseInt(current.matcheswin) +
-                  ' ' +
-                  parseInt(current.matchescount) +
-                  ' = ' +
-                  parseInt(current.matcheswin) / parseInt(current.matchescount),
-              )
-              return (
-                total +
-                parseInt(current.matcheswin) / parseInt(current.matchescount)
-                // (parseInt(current.radiant_matcheswin) /
-                //   parseInt(current.radiant_matchescount) +
-                //   parseInt(current.matcheswin) /
-                //     parseInt(current.matchescount)) /
-                //   2
-              )
-            } else if (parseInt(current.matchescount) > 10) {
-              radiantTotalCount++
-              console.log(
-                'current rad id ' +
-                  current.steamaccountid +
-                  ' ' +
-                  parseInt(current.matcheswin) +
-                  ' ' +
-                  parseInt(current.matchescount) +
-                  ' = ' +
-                  parseInt(current.matcheswin) / parseInt(current.matchescount),
-              )
-              return (
-                total +
-                parseInt(current.matcheswin) / parseInt(current.matchescount)
-              )
+            if (current) {
+              if (parseInt(current.radiant_matchescount) > 10) {
+                radiantTotalCount++
+                console.log(
+                  'current rad id ' +
+                    current.steamaccountid +
+                    ' ' +
+                    parseInt(current.matcheswin) +
+                    ' ' +
+                    parseInt(current.matchescount) +
+                    ' = ' +
+                    parseInt(current.matcheswin) /
+                      parseInt(current.matchescount),
+                )
+                return (
+                  total +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount)
+                  // (parseInt(current.radiant_matcheswin) /
+                  //   parseInt(current.radiant_matchescount) +
+                  //   parseInt(current.matcheswin) /
+                  //     parseInt(current.matchescount)) /
+                  //   2
+                )
+              } else if (parseInt(current.matchescount) > 10) {
+                radiantTotalCount++
+                console.log(
+                  'current rad id ' +
+                    current.steamaccountid +
+                    ' ' +
+                    parseInt(current.matcheswin) +
+                    ' ' +
+                    parseInt(current.matchescount) +
+                    ' = ' +
+                    parseInt(current.matcheswin) /
+                      parseInt(current.matchescount),
+                )
+                return (
+                  total +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount)
+                )
+              } else return total
             } else return total
           }, 0)
 
@@ -1954,44 +1966,48 @@ export class PredictionService {
       if (direStatistic) {
         if (direStatistic[0]) {
           const direTotal = direStatistic.reduce((total, current) => {
-            if (parseInt(current.dire_matchescount) > 10) {
-              direTotalCount++
-              console.log(
-                'current dir id ' +
-                  current.steamaccountid +
-                  ' ' +
-                  parseInt(current.matcheswin) +
-                  ' ' +
-                  parseInt(current.matchescount) +
-                  ' = ' +
-                  parseInt(current.matcheswin) / parseInt(current.matchescount),
-              )
-              return (
-                total +
-                parseInt(current.matcheswin) / parseInt(current.matchescount)
-                // (parseInt(current.dire_matcheswin) /
-                //   parseInt(current.dire_matchescount) +
-                //   parseInt(current.matcheswin) /
-                //     parseInt(current.matchescount)) /
-                //   2
-              )
-            } else if (parseInt(current.matchescount) > 10) {
-              direTotalCount++
-              console.log(
-                'current dir id ' +
-                  current.steamaccountid +
-                  ' ' +
-                  parseInt(current.matcheswin) +
-                  ' ' +
-                  parseInt(current.matchescount) +
-                  ' = ' +
-                  parseInt(current.matcheswin) / parseInt(current.matchescount),
-              )
-              return (
-                total +
-                parseInt(current.matcheswin) / parseInt(current.matchescount)
-              )
-            } else return total
+            if (current) {
+              if (parseInt(current.dire_matchescount) > 10) {
+                direTotalCount++
+                console.log(
+                  'current dir id ' +
+                    current.steamaccountid +
+                    ' ' +
+                    parseInt(current.matcheswin) +
+                    ' ' +
+                    parseInt(current.matchescount) +
+                    ' = ' +
+                    parseInt(current.matcheswin) /
+                      parseInt(current.matchescount),
+                )
+                return (
+                  total +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount)
+                  // (parseInt(current.dire_matcheswin) /
+                  //   parseInt(current.dire_matchescount) +
+                  //   parseInt(current.matcheswin) /
+                  //     parseInt(current.matchescount)) /
+                  //   2
+                )
+              } else if (parseInt(current.matchescount) > 10) {
+                direTotalCount++
+                console.log(
+                  'current dir id ' +
+                    current.steamaccountid +
+                    ' ' +
+                    parseInt(current.matcheswin) +
+                    ' ' +
+                    parseInt(current.matchescount) +
+                    ' = ' +
+                    parseInt(current.matcheswin) /
+                      parseInt(current.matchescount),
+                )
+                return (
+                  total +
+                  parseInt(current.matcheswin) / parseInt(current.matchescount)
+                )
+              } else return total
+            } else total
           }, 0)
           if (direTotalCount > 0) {
             direTotalSum += direTotal / direTotalCount
@@ -2269,7 +2285,7 @@ export class PredictionService {
           },
         },
         limit: 5,
-        order: [['start_date_time', 'ASC']],
+        order: [['start_date_time', 'DESC']],
       })
       return predictions
     } catch (error) {

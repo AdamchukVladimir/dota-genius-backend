@@ -6,7 +6,7 @@ export const FETCH_LIVE_QUERY = gql`
       matches(
         request: {
           skip: 0
-          take: 5
+          take: 1000
           tiers: [
             UNSET
             PROFESSIONAL

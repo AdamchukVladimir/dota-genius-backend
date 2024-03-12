@@ -26,6 +26,7 @@ import { TeamsVsTeams } from './models/temsvsteams.model'
 import { Team } from './models/teams.model'
 import { Players } from './models/players.model'
 import { TelegramModule } from './telegram/telegram.module';
+import { UsersTgModule } from './users_tg/users_tg.module';
 
 @Module({
   controllers: [AppController],
@@ -73,7 +74,7 @@ import { TelegramModule } from './telegram/telegram.module';
     MatchesModule,
     QueueModule, // Redis
     SqlReloaderModule, // Reloader clear SQL queries
-    PredictionModule, TelegramModule,
+    PredictionModule, TelegramModule, UsersTgModule,
   ],
 })
 export class AppModule {}

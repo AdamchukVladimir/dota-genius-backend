@@ -18,16 +18,24 @@ export class GraphQLService {
   }
 
   async initializeApolloClient() {
-    this.authToken = await this.getTokenFromDB()
+    try {
+      this.authToken = await this.getTokenFromDB()
 
-    const cache = new InMemoryCache() as any // Fix ts type problem
-    this.apolloClient = new ApolloClient({
-      uri: 'https://api.stratz.com/graphql',
-      cache: cache,
-      headers: {
-        Authorization: this.authToken ? `Bearer ${this.authToken}` : '',
-      },
-    })
+      const cache = new InMemoryCache() as any // Fix ts type problem
+      this.apolloClient = new ApolloClient({
+        uri: 'https://api.stratz.com/graphql',
+        cache: cache,
+        headers: {
+          Authorization: this.authToken ? `Bearer ${this.authToken}` : '',
+        },
+      })
+    } catch (error) {
+      this.logger.error(
+        'initializeApolloClient Failed to initialize Apollo client:',
+        error,
+      )
+      throw error
+    }
   }
 
   private async getTokenFromDB(): Promise<string> {

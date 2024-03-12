@@ -10,6 +10,7 @@ import { Match } from '../models/match.model'
 import { MatchesPlayers } from '../models/matchesplayers.model'
 import { MATCH_DETAILS_QUERY } from '../api/graphql/queries/matchDetails'
 import { Op } from 'sequelize'
+import { FETCH_LIVE_QUERY } from '../api/graphql/queries/live'
 
 @Injectable()
 export class MatchesService {
@@ -19,7 +20,14 @@ export class MatchesService {
     @Inject(forwardRef(() => QueueService))
     private readonly queueService: QueueService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+  ) {
+    this.graphQLService.initializeApolloClient().catch((error) => {
+      this.logger.error(
+        'MatchesService Failed to initialize Apollo client:',
+        error,
+      )
+    })
+  }
 
   @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async processMatchesByLeagues(): Promise<void> {
@@ -333,6 +341,22 @@ export class MatchesService {
         new Date().toLocaleString() +
           ' match.service ERROR getHeroIdByPosition: ' +
           position,
+        error,
+      )
+    }
+  }
+
+  async fetchAllLiveMatches(): Promise<any> {
+    try {
+      let liveMatches
+      liveMatches = await this.graphQLService.apolloClient.query({
+        query: FETCH_LIVE_QUERY,
+      })
+      return liveMatches
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service fetchAllLiveMatches Error :`,
         error,
       )
     }
