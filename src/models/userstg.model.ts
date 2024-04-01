@@ -27,10 +27,16 @@ export class UserTG extends Model {
   username: string
 
   @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  firstname: string
+
+  @Column({
     type: DataType.BOOLEAN,
     allowNull: true,
   })
-  notificatianOn: boolean
+  notificationOn: boolean
 
   @Column({
     type: DataType.BOOLEAN,

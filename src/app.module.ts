@@ -25,8 +25,9 @@ import { TeamHeroesVersus } from './models/teamheroesversus.model'
 import { TeamsVsTeams } from './models/temsvsteams.model'
 import { Team } from './models/teams.model'
 import { Players } from './models/players.model'
-import { TelegramModule } from './telegram/telegram.module';
-import { UsersTgModule } from './users_tg/users_tg.module';
+import { TelegramModule } from './telegram/telegram.module'
+import { UsersTgModule } from './users_tg/users_tg.module'
+import { UserTG } from './models/userstg.model'
 
 @Module({
   controllers: [AppController],
@@ -56,6 +57,7 @@ import { UsersTgModule } from './users_tg/users_tg.module';
         TeamsVsTeams,
         Team,
         Players,
+        UserTG,
       ], //import sequilize postgres model
       //autoLoadModels: true,
       //synchronize: true,
@@ -74,7 +76,9 @@ import { UsersTgModule } from './users_tg/users_tg.module';
     MatchesModule,
     QueueModule, // Redis
     SqlReloaderModule, // Reloader clear SQL queries
-    PredictionModule, TelegramModule, UsersTgModule,
+    PredictionModule,
+    TelegramModule,
+    UsersTgModule,
   ],
 })
 export class AppModule {}

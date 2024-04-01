@@ -9,6 +9,8 @@ import { QueueService } from 'src/queues/queue.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { BullModule } from '@nestjs/bull'
 import { UsersTgService } from 'src/users_tg/users_tg.service'
+import { SequelizeModule } from '@nestjs/sequelize'
+import { UserTG } from 'src/models/userstg.model'
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { UsersTgService } from 'src/users_tg/users_tg.service'
     BullModule.registerQueue({
       name: 'graphql-to-db',
     }),
+    SequelizeModule.forFeature([UserTG]),
   ],
   providers: [
     TelegramService,
@@ -34,6 +37,7 @@ import { UsersTgService } from 'src/users_tg/users_tg.service'
     MatchesService,
     LeaguesService,
     QueueService,
+    UsersTgService,
   ],
   controllers: [TelegramController],
 })

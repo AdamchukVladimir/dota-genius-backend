@@ -170,6 +170,12 @@ export class Predictions extends Model {
   })
   prediction_result: number
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+  })
+  notified: boolean
+
   @CreatedAt
   @Column({
     type: DataType.DATE,

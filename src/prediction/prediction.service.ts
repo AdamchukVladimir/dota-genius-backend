@@ -27,7 +27,7 @@ export class PredictionService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async processPredictions(): Promise<any> {
     try {
       const allLiveMatches = await this.matchesService.fetchAllLiveMatches() // Fetches data as a promise
@@ -139,7 +139,7 @@ export class PredictionService {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async reloadPredictionsByFinishedMatches(): Promise<void> {
     try {
       const predictions = await this.getPredictionsFromDB()
@@ -1829,7 +1829,7 @@ export class PredictionService {
       if (radiantStatistic) {
         if (radiantStatistic[0]) {
           const radiantTotal = radiantStatistic.reduce((total, current) => {
-            if (parseInt(current.firstbloodtime_avg)) {
+            if (parseInt(current?.firstbloodtime_avg)) {
               radiantTotalCount++
               console.log(
                 'current rad id ' +
@@ -1852,7 +1852,7 @@ export class PredictionService {
       if (direStatistic) {
         if (direStatistic[0]) {
           const direTotal = direStatistic.reduce((total, current) => {
-            if (parseInt(current.firstbloodtime_avg)) {
+            if (parseInt(current?.firstbloodtime_avg)) {
               direTotalCount++
               console.log(
                 'current dir id ' +
@@ -1889,7 +1889,7 @@ export class PredictionService {
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
-          'prediction.service calculatePredictionByPlayers Error:',
+          'prediction.service calculatePredictionByPlayersFirstblood Error:',
         error,
       )
     }
@@ -2284,14 +2284,44 @@ export class PredictionService {
             [Op.not]: null,
           },
         },
-        limit: 5,
-        order: [['start_date_time', 'DESC']],
+        limit: 10,
+        //order: [['start_date_time', 'DESC']],
+        order: [['match_id', 'DESC']],
       })
       return predictions
     } catch (error) {
       this.logger.error(
         new Date().toLocaleString() +
           ` prediction.service getFinishedPredictionFromDB Error :`,
+        error,
+      )
+    }
+  }
+
+  async setNotifiedToPrediction(predictionMatchId): Promise<any> {
+    try {
+      const prediction = await Predictions.findOne({
+        where: {
+          match_id: {
+            [Op.eq]: predictionMatchId,
+          },
+        },
+      })
+
+      if (prediction) {
+        await prediction.update({ notified: true })
+      } else {
+        console.log('Prediction not found')
+        this.logger.info(
+          new Date().toLocaleString() +
+            ` prediction.service setNotifiedToPrediction not found Match_id :` +
+            predictionMatchId,
+        )
+      }
+    } catch (error) {
+      this.logger.error(
+        new Date().toLocaleString() +
+          ` prediction.service setNotifiedToPrediction Error :`,
         error,
       )
     }
